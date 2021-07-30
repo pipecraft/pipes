@@ -1,0 +1,9 @@
+.idea
+.project
+.settings
+*~
+*.iml
+/pipes-core/target/
+/pipes-google-cs/target/
+/pipes-google-bq/target/
+/pipes-amazon-s3/target/
