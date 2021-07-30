@@ -8,6 +8,24 @@
   <artifactId>pipes-amazon-s3</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>An Amazon S3 extension for pipes</description>
+  <url>https://github.com/pipecraft/pipes/blob/master/tutorial/page0.md</url>
+
+  <developers>
+    <developer>
+      <name>Eyal Schneider</name>
+      <email>eyalsch@gmail.com</email>
+      <organization>pipecraft.org</organization>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/pipecraft/pipes.git</connection>
+    <developerConnection>scm:git:https://github.com/pipecraft/pipes/tree/master/pipes-amazon-s3</developerConnection>
+    <url>https://github.com/pipecraft/pipes/tree/master/pipes-amazon-s3</url>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>org.pipecraft</groupId>

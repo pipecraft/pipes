@@ -8,6 +8,31 @@
   <artifactId>pipes-core</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>The core part of Pipes framework</description>
+  <url>https://github.com/pipecraft/pipes/blob/master/tutorial/page0.md</url>
+
+  <developers>
+    <developer>
+      <name>Eyal Schneider</name>
+      <email>eyalsch@gmail.com</email>
+      <organization>pipecraft.org</organization>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/pipecraft/pipes.git</connection>
+    <developerConnection>scm:git:https://github.com/pipecraft/pipes/tree/master/pipes-core</developerConnection>
+    <url>https://github.com/pipecraft/pipes/tree/master/pipes-core</url>
+  </scm>
+
   <properties>
     <slf.version>1.7.30</slf.version>
     <jackson.version>2.10.2</jackson.version>
