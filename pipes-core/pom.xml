@@ -36,7 +36,6 @@
   <properties>
     <slf.version>1.7.30</slf.version>
     <jackson.version>2.10.2</jackson.version>
-    <jackson.version>2.10.2</jackson.version>
     <netty.version>4.1.46.Final</netty.version>
   </properties>
 
