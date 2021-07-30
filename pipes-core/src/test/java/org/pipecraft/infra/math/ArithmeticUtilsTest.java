@@ -1,50 +1,16 @@
 package org.pipecraft.infra.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.exception.MathArithmeticException;
 import org.junit.jupiter.api.Test;
 
 public class ArithmeticUtilsTest {
   @Test
-  public void testOneNull() {
-    Long a = null;
-    Long b = 4l;
-
-    assertEquals(b, ArithmeticUtils.add(a, b));
-    assertEquals(b, ArithmeticUtils.add(b, a));
-  }
-
-  @Test
-  public void testBothNull() {
-    Long a = null;
-    Long b = null;
-
-    assertNull(ArithmeticUtils.add(a, b));
-  }
-
-  @Test
-  public void testCorrect() {
-    Long a = 200l;
-    Long b = -100l;
-
-    assertEquals(100l, ArithmeticUtils.add(a, b));
-  }
-
-  @Test
-  public void testOverflow() {
-    assertThrows(MathArithmeticException.class, () -> ArithmeticUtils.add(Long.MAX_VALUE, 9L));
-  }
-
-  @Test
-  public void testUnionProbability() throws Exception {
+  public void testUnionProbability() {
     List<Pair<List<Double>, Double>> data =
         Arrays.asList(
             new ImmutablePair<>(Arrays.asList(0.5, 0.5), 0.75),
