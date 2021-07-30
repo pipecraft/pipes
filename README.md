@@ -1,4 +1,4 @@
-# pipes
+# Pipes
 
 Pipes is a simple, lightweight data processing framework for Java.
 This repo comes with the core part plus three extensions (For Google Big Query, Google cloud storage and Amazon S3 storage).
