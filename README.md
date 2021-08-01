@@ -8,7 +8,7 @@ This project is licensed under the terms of the MIT license.
 
 # Installation
 
-Pipes library jars are released via Maven Central Repository. The current version is 9.0.
+Pipes library jars are released via Maven Central Repository. The current version is 0.9.
 
 Core artifact:
 
