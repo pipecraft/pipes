@@ -36,7 +36,7 @@ public class SortPipe<T> implements Pipe<T> {
   private final Comparator<T> comparator;
   private final int maxItemsInMemory;
   private final Compression tempFilesCompression;
-  private final List<T> currentChunk;
+  private List<T> currentChunk;
   private final List<File> sortedFiles;
   private final EncoderFactory<? super T> encoderFactory;
   private final DecoderFactory<T> decoderFactory;
@@ -125,6 +125,7 @@ public class SortPipe<T> implements Pipe<T> {
 
   @Override
   public void close() throws IOException {
+    currentChunk = null; // Release reference to a possibly large unused memory chunk
     FileUtils.close(input, finalOutputPipe);
 
     for (File f : sortedFiles) {
