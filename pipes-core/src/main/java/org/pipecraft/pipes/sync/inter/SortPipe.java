@@ -124,10 +124,9 @@ public class SortPipe<T> implements Pipe<T> {
 
   @Override
   public void close() throws IOException {
-    // These line is intended to release the reference to a possibly large unused memory chunk
-    finalOutputPipe = EmptyPipe.instance();
-
     FileUtils.close(input, finalOutputPipe);
+
+    finalOutputPipe = EmptyPipe.instance(); // These line is intended to release the reference to a possibly large unused memory chunk
 
     for (File f : sortedFiles) {
       f.delete(); // Files are created as temp files which should be deleted on JVM shutdown anyway. Ignore if deletion fails.
