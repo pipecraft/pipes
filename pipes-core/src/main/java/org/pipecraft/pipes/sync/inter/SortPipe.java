@@ -18,6 +18,7 @@ import org.pipecraft.pipes.exceptions.PipeException;
 import org.pipecraft.pipes.serialization.DecoderFactory;
 import org.pipecraft.pipes.sync.source.BinInputReaderPipe;
 import org.pipecraft.pipes.sync.source.CollectionReaderPipe;
+import org.pipecraft.pipes.sync.source.EmptyPipe;
 import org.pipecraft.pipes.terminal.BinFileWriterPipe;
 
 /**
@@ -36,7 +37,6 @@ public class SortPipe<T> implements Pipe<T> {
   private final Comparator<T> comparator;
   private final int maxItemsInMemory;
   private final Compression tempFilesCompression;
-  private List<T> currentChunk;
   private final List<File> sortedFiles;
   private final EncoderFactory<? super T> encoderFactory;
   private final DecoderFactory<T> decoderFactory;
@@ -55,7 +55,6 @@ public class SortPipe<T> implements Pipe<T> {
    */
   public SortPipe(Pipe<T> input, int maxItemsInMemory, File tmpFolder, EncoderFactory<? super T> encoderFactory, DecoderFactory<T> decoderFactory, Comparator<T> comparator, Compression tempFilesCompression) {
     this.input = input;
-    this.currentChunk = new ArrayList<>(maxItemsInMemory == Integer.MAX_VALUE ? 1024 : maxItemsInMemory);
     this.tmpFolder = tmpFolder;
     this.encoderFactory = encoderFactory;
     this.decoderFactory = decoderFactory;
@@ -125,7 +124,9 @@ public class SortPipe<T> implements Pipe<T> {
 
   @Override
   public void close() throws IOException {
-    currentChunk = null; // Release reference to a possibly large unused memory chunk
+    // These line is intended to release the reference to a possibly large unused memory chunk
+    finalOutputPipe = EmptyPipe.instance();
+
     FileUtils.close(input, finalOutputPipe);
 
     for (File f : sortedFiles) {
@@ -147,6 +148,7 @@ public class SortPipe<T> implements Pipe<T> {
   public void start() throws PipeException, InterruptedException {
     input.start();
 
+    List<T> currentChunk = new ArrayList<>(maxItemsInMemory == Integer.MAX_VALUE ? 1024 : maxItemsInMemory);
     while (true) {
       // Consume from input pipe until chunk is full or end of input is found
       while (input.peek() != null && currentChunk.size() < maxItemsInMemory) {
@@ -173,8 +175,7 @@ public class SortPipe<T> implements Pipe<T> {
           if (input.peek() == null) { // End of input - build a sorted union pipeline on all intermediate files
             ArrayList<Pipe<T>> sortedPipes = new ArrayList<>();
             for (File f : sortedFiles) {
-              BinInputReaderPipe<T> p = new BinInputReaderPipe<>(f, new FileReadOptions().setCompression(tempFilesCompression)
-                  , decoderFactory);
+              BinInputReaderPipe<T> p = new BinInputReaderPipe<>(f, new FileReadOptions().setCompression(tempFilesCompression), decoderFactory);
               sortedPipes.add(p);
             }
 
