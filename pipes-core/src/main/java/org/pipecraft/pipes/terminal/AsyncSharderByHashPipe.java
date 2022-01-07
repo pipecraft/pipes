@@ -2,6 +2,7 @@ package org.pipecraft.pipes.terminal;
 
 import java.io.File;
 
+import java.util.function.Function;
 import org.pipecraft.pipes.async.AsyncPipe;
 import org.pipecraft.infra.io.FileWriteOptions;
 import org.pipecraft.infra.math.ArithmeticUtils;
@@ -29,7 +30,21 @@ public class AsyncSharderByHashPipe <T> extends AsyncSharderPipe<T>{
   public AsyncSharderByHashPipe(AsyncPipe<T> input, EncoderFactory<? super T> encoderFactory, int shardCount, File folder, FileWriteOptions writeOptions) {
     super(input, encoderFactory, v -> getShardFor(v, shardCount), folder, writeOptions);
   }
-  
+
+  /**
+   * Constructor
+   *
+   * @param input The input pipe
+   * @param featureSelectorFunction An extractor of the item's feature on which hashing and sharding is performed
+   * @param encoderFactory The encoder factory to use for writing items into the different shards
+   * @param shardCount The required number of shards (files) to produce. Their names will be numbers in the rage 0 to shardCount - 1.
+   * @param folder The folder where to place all shards. Must exist.
+   * @param writeOptions Specify how the shard files should be written
+   */
+  public AsyncSharderByHashPipe(AsyncPipe<T> input, Function<T, Object> featureSelectorFunction, EncoderFactory<? super T> encoderFactory, int shardCount, File folder, FileWriteOptions writeOptions) {
+    super(input, encoderFactory, v -> getShardFor(featureSelectorFunction.apply(v), shardCount), folder, writeOptions);
+  }
+
   /**
    * Constructor 
    * 
@@ -42,7 +57,20 @@ public class AsyncSharderByHashPipe <T> extends AsyncSharderPipe<T>{
   public AsyncSharderByHashPipe(AsyncPipe<T> input, EncoderFactory<? super T> encoderFactory, int shardCount, File folder) {
     super(input, encoderFactory, v -> getShardFor(v, shardCount), folder);
   }
-  
+
+  /**
+   * Constructor
+   *
+   * @param input The input pipe
+   * @param featureSelectorFunction An extractor of the item's feature on which hashing and sharding is performed
+   * @param encoderFactory The encoder factory to use for writing items into the different shards
+   * @param shardCount The required number of shards (files) to produce. Their names will be numbers in the rage 0 to shardCount - 1.
+   * @param folder The folder where to place all shards. Must exist.
+   */
+  public AsyncSharderByHashPipe(AsyncPipe<T> input, Function<T, Object> featureSelectorFunction, EncoderFactory<? super T> encoderFactory, int shardCount, File folder) {
+    super(input, encoderFactory, v -> getShardFor(featureSelectorFunction.apply(v), shardCount), folder, new FileWriteOptions());
+  }
+
   private static <V> String getShardFor(V item, int shardCount) {
     return String.valueOf(ArithmeticUtils.getShardByHash(item, shardCount));
   }
