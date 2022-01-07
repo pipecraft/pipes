@@ -8,7 +8,9 @@ import org.pipecraft.pipes.sync.inter.ProgressPipe;
  * A progress listener wrapping another progress listener, allowing filtering of progress events and changing the reported progress range.
  * 
  * Useful as a parameter to the {@link ProgressPipe}.
- * 
+ *
+ * Not thread safe.
+ *
  * @author Eyal Schneider
  */
 public class ProgressTransformer implements Consumer<Integer> {
