@@ -13,7 +13,9 @@ import java.util.function.Function;
  *
  * @author Eyal Schneider
  */
-public class TxtCodecFactory <T> extends DelegatingCodecFactory <T> {
+public class TxtCodecFactory<T> extends DelegatingCodecFactory <T> {
+  // A simple encoder/decoder for string items, encoding/decoding the string itself as is, using UTF8
+  public static final TxtCodecFactory<String> IDENTITY = new TxtCodecFactory<>(x -> x, x -> x);
 
   /**
    * Constructor

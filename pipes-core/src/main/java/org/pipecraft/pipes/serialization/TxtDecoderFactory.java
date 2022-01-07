@@ -20,6 +20,8 @@ import org.pipecraft.pipes.exceptions.ValidationPipeException;
  * @author Eyal Schneider
  */
 public class TxtDecoderFactory<T> implements DecoderFactory<T> {
+  // A simple decoder for string items, decoding the string itself as is, using UTF8
+  public static final TxtDecoderFactory<String> IDENTITY = new TxtDecoderFactory<>(x -> x);
   private final FailableFunction<String, T, ? extends ValidationPipeException> itemDetextualizer;
   private final Charset charset;
 

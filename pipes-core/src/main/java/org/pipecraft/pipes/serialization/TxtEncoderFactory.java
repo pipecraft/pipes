@@ -19,6 +19,8 @@ import org.pipecraft.infra.io.FileWriteOptions;
  * @author Eyal Schneider
  */
 public class TxtEncoderFactory<T> implements EncoderFactory<T> {
+  // A simple encoder for string items, encoding the string itself as is, using UTF8
+  public static final TxtEncoderFactory<String> IDENTITY = new TxtEncoderFactory<>(x -> x);
   private final Function<T, String> itemTextualizer;
   private final Charset charset;
 
