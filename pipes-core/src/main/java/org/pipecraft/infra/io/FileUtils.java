@@ -2,6 +2,8 @@ package org.pipecraft.infra.io;
 
 import static net.minidev.json.parser.JSONParser.DEFAULT_PERMISSIVE_MODE;
 
+import com.github.luben.zstd.ZstdInputStream;
+import com.github.luben.zstd.ZstdOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -618,7 +620,17 @@ public class FileUtils {
    * @param logger The logger to log to in case deletion fails (as warning). Use null for no logging.
    * @param files The files to delete. Null files are ignored. File objects may be folders - In this case, the complete folder is deleted, recursively.
    */
-  public static void deleteFiles(org.slf4j.Logger logger, File... files) {
+  public static void deleteFiles(org.slf4j.Logger logger, File ... files) {
+    deleteFiles(logger, Arrays.asList(files));
+  }
+
+  /**
+   * Deletes a set of files/folders, ignoring failures.
+   *
+   * @param logger The logger to log to in case deletion fails (as warning). Use null for no logging.
+   * @param files The files to delete. Null files are ignored. File objects may be folders - In this case, the complete folder is deleted, recursively.
+   */
+  public static void deleteFiles(org.slf4j.Logger logger, Collection<File> files) {
     for (File f : files) {
       deleteFile(f, logger);
     }
@@ -630,6 +642,15 @@ public class FileUtils {
    * @param files The files to delete. Null files are ignored. File objects may be folders - In this case, the complete folder is deleted, recursively.
    */
   public static void deleteFiles(File... files) {
+    deleteFiles(null, files);
+  }
+
+  /**
+   * Deletes a set of files/folders, ignoring failures.
+   *
+   * @param files The files to delete. Null files are ignored. File objects may be folders - In this case, the complete folder is deleted, recursively.
+   */
+  public static void deleteFiles(Collection<File> files) {
     deleteFiles(null, files);
   }
 
