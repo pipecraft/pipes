@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -369,7 +370,30 @@ public final class Coding {
     dest[offset++] = (byte) (value >> 8 & 0xFF);
     dest[offset] = (byte) (value & 0xFF);
   }
-  
+
+  /* Strings */
+
+  /**
+   * @param s The string to serialize
+   * @param os The output stream to write to
+   * @throws IOException
+   */
+  public static void writeUTF8(String s, OutputStream os) throws IOException {
+    byte[] byteArr = s.getBytes(StandardCharsets.UTF_8);
+    Coding.writeVarint32(byteArr.length, os);
+    os.write(byteArr);
+  }
+
+  /**
+   * @param is The input stream to read from
+   * @return The string read from the stream
+   * @throws IOException
+   */
+  public static String readUTF8(InputStream is) throws IOException {
+    byte[] byteArr = Coding.read(is, Coding.readVarint32(is, new MutableInt()));
+    return new String(byteArr, StandardCharsets.UTF_8);
+  }
+
   /* VARINT32 routines  The following functions are adapted from protobuf package. */
   
   /**
@@ -403,7 +427,19 @@ public final class Coding {
       value >>>= 7;
     }
   }
-  
+
+  /**
+   * @param value The value to write
+   * @param os The stream to write to. Not closed by this method.
+   * @return the number of bytes written
+   * @throws IOException
+   */
+  public static int writeVarint32(int value, OutputStream os) throws IOException {
+    byte[] buffer = new byte[5];
+    int count = writeVarint32(value, buffer, 0);
+    os.write(buffer, 0, count);
+    return count;
+  }
 
   /**
    * Reads a varint from a given input stream.
