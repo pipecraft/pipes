@@ -4,12 +4,10 @@ import org.pipecraft.pipes.sync.Pipe;
 import org.pipecraft.pipes.exceptions.PipeException;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
+import org.pipecraft.pipes.utils.QueueItem;
 
 /**
  * A terminal pipe writing items to a {@link BlockingQueue}.
- * Uses special item values as queue end marker indicators.
- * For proper behavior, the same marker references (one for error and one for successful termination) should also
- * be used by the queue consumer.
  *
  * Note that this pipe can cause a deadlock if not used properly. Calling start() will start pushing to the queue in a blocking manner,
  * meaning that the consumer should be a different thread (or alternatively the queue should not be bounded, which is memory risky).
@@ -19,11 +17,21 @@ import java.util.concurrent.BlockingQueue;
  * @author Eyal Schneider
  */
 public class QueueWriterPipe<T> extends TerminalPipe {
-
-  private final BlockingQueue<T> queue;
-  private final T successMarker;
-  private final T errorMarker;
+  private final BlockingQueue<QueueItem<T>> queue;
   private final Pipe<T> inputPipe;
+
+  /**
+   * Constructor
+   *
+   * @param inputPipe     The pipe to read items from and push them to the queue
+   * @param queue         The queue to write to
+   *
+   */
+  @SuppressWarnings("unchecked")
+  public QueueWriterPipe(Pipe<T> inputPipe, BlockingQueue<QueueItem<T>> queue) {
+    this.inputPipe = inputPipe;
+    this.queue = queue;
+  }
 
   /**
    * Constructor
@@ -36,13 +44,14 @@ public class QueueWriterPipe<T> extends TerminalPipe {
    * @param errorMarker   Used for indicating an error termination. Should be a unique reference
    *                      reserved for this purpose. Consumer should use the same marker reference
    *                      for error indication.
+   *
+   * @deprecated Use the constructor without the queue markers instead
    */
-  public QueueWriterPipe(Pipe<T> inputPipe, BlockingQueue<T> queue, T successMarker,
-      T errorMarker) {
+  @SuppressWarnings("unchecked")
+  @Deprecated
+  public QueueWriterPipe(Pipe<T> inputPipe, BlockingQueue<T> queue, T successMarker, T errorMarker) {
     this.inputPipe = inputPipe;
-    this.queue = queue;
-    this.successMarker = successMarker;
-    this.errorMarker = errorMarker;
+    this.queue = (BlockingQueue<QueueItem<T>>) queue;
   }
 
   @Override
@@ -51,12 +60,12 @@ public class QueueWriterPipe<T> extends TerminalPipe {
       inputPipe.start();
       T item;
       while ((item = inputPipe.next()) != null) {
-        queue.put(item);
+        queue.put(QueueItem.of(item));
       }
-      queue.put(successMarker);
+      queue.put(QueueItem.end());
     } catch (Throwable e) {
       // Make an effort to release the consumer, regardless of the error type
-      while (!queue.offer(errorMarker)) {
+      while (!queue.offer(QueueItem.error(e))) {
         queue.clear();
       }
       throw e;

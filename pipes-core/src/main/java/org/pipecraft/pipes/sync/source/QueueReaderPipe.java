@@ -6,13 +6,11 @@ import java.util.concurrent.BlockingQueue;
 import org.pipecraft.pipes.sync.Pipe;
 import org.pipecraft.pipes.exceptions.PipeException;
 import org.pipecraft.pipes.exceptions.QueuePipeException;
+import org.pipecraft.pipes.utils.QueueItem;
 
 /**
  * A source pipe reading the contents of a {@link BlockingQueue}.
- * Uses special item values as queue end marker indicators.
- * For proper behavior, the same marker references (one for error and one for successful termination) should also
- * be used by the queue producer.
- * 
+ *
  * This pipe is detached from the producer and has no knowledge on expected item count, therefore progress tracking is not possible
  * and simply jumps from 0.0 to 1.0 once the queue is fully consumed.
  * 
@@ -21,13 +19,20 @@ import org.pipecraft.pipes.exceptions.QueuePipeException;
  * @author Eyal Schneider
  */
 public class QueueReaderPipe <T> implements Pipe<T> {
-  private final BlockingQueue<T> queue;
-  private final T successMarker;
-  private final T errorMarker;
+  private final BlockingQueue<QueueItem<T>> queue;
   private boolean complete;
   private T next;
   private PipeException exception;
-  
+
+  /**
+   * Constructor
+   *
+   * @param queue The queue to read from
+   */
+  public QueueReaderPipe(BlockingQueue<QueueItem<T>> queue) {
+    this.queue = queue;
+  }
+
   /**
    * Constructor
    * 
@@ -35,11 +40,13 @@ public class QueueReaderPipe <T> implements Pipe<T> {
    * @param successMarker Used for indicating data completion with success. Should be a unique reference reserved for this purpose.
    * @param errorMarker Used for indicating an error termination. Should be a unique reference reserved for this purpose.
    * When found, the next() method will throw an exception.
+   *
+   * @deprecated Use the constructor without markers instead
    */
+  @SuppressWarnings("unchecked")
+  @Deprecated
   public QueueReaderPipe(BlockingQueue<T> queue, T successMarker, T errorMarker) {
-    this.queue = queue;
-    this.successMarker = successMarker;
-    this.errorMarker = errorMarker;
+    this.queue = (BlockingQueue<QueueItem<T>>) queue;
   }
   
   @Override
@@ -81,16 +88,20 @@ public class QueueReaderPipe <T> implements Pipe<T> {
 
   public void prepareNext() throws InterruptedException {
     if (!complete) {
-      T item = queue.take();
-      if (item == successMarker) {
+      QueueItem<T> queueItem = queue.take();
+      if (queueItem.isSuccessfulEndOfData()) {
         complete = true;
         next = null;
-      } else if (item == errorMarker) {
-        complete = true;
-        exception = new QueuePipeException("Error signaled by queue producer");
       } else {
-        this.next = item;
+        Throwable e = queueItem.getThrowable();
+        if (e != null) {
+          complete = true;
+          exception = new QueuePipeException("Error signaled by queue producer", e);
+        } else {
+          this.next = queueItem.getItem();
+        }
       }
     }
   }
+
 }
