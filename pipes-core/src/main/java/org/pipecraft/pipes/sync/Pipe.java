@@ -19,7 +19,7 @@ import org.pipecraft.pipes.terminal.TerminalPipe;
  * 7) Pipes are interruptible and are encouraged to be implemented accordingly.
  * 8) Pipes support progress tracking for monitoring iteration progress
  * 9) Thread safety:
- *    9.1. In general pipes aren't required to be fully thread safe by support multiple threads calling their public methods. 
+ *    9.1. In general pipes aren't required to be fully thread safe by supporting multiple threads calling their public methods.
  *         Unless specified otherwise, when consuming a pipe, it's important to make sure that the same thread which invokes start() is the one invoking next() / peek() and finally close() later.
  *    9.2. If the implementation exposes state through getters, the data should be protected (e.g. defined as volatile), since it may be written/read by different threads.
  *    9.3. Constructors should assign final data members only
@@ -41,14 +41,14 @@ import org.pipecraft.pipes.terminal.TerminalPipe;
  *   }
  * }
  *  
- * @param <T> The type of the ouput items
+ * @param <T> The type of the output items
  *
  * @author Eyal Schneider
  */
 public interface Pipe<T> extends BasePipe {
   
   /**
-   * @return The next item in this pipe output, or null if the output end has been reached. May be a blocking operation.
+   * @return The next item in this pipe output, or null if the output end has been reached. Allowed to be a blocking operation.
    * @throws PipeException In case of pipe errors in this pipe or somewhere up-stream while trying to prepare next item to return.
    * @throws InterruptedException In case that the operation has been interrupted by another thread.
    */

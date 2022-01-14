@@ -100,7 +100,7 @@ class ShuffleClient<T> {
             .option(ChannelOption.SO_SNDBUF, 1048576)
             .option(ChannelOption.SO_RCVBUF, 1048576)
             .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(2 * 65536, 10 * 65536))
-            .handler(new ChannelInitializer<Channel>() {
+            .handler(new ChannelInitializer<>() {
               @Override
               protected void initChannel(Channel ch) {
                 ChannelPipeline pipeline = ch.pipeline();
