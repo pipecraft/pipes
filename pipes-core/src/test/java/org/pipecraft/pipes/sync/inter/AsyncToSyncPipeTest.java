@@ -11,8 +11,10 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
+import org.pipecraft.pipes.async.AsyncPipe;
 import org.pipecraft.pipes.async.DummyAsyncPipe;
-import org.pipecraft.pipes.exceptions.ValidationPipeException;
+import org.pipecraft.pipes.exceptions.PipeException;
+import org.pipecraft.pipes.sync.Pipe;
 
 /**
  * Tests {@link AsyncToSyncPipe}
@@ -24,8 +26,8 @@ public class AsyncToSyncPipeTest {
 
   @Test
   public void testEmpty() throws Exception {
-    try (DummyAsyncPipe ap = new DummyAsyncPipe(0, 0, true);
-        AsyncToSyncPipe<Integer> a2q = new AsyncToSyncPipe<>(ap, 10, () -> new Integer(0))) {
+    try (AsyncPipe<Integer> ap = new DummyAsyncPipe(0, 0, true);
+        Pipe<Integer> a2q = new AsyncToSyncPipe<>(ap, 10)) {
       a2q.start();
       assertNull(a2q.next());
       assertEquals(1.0, a2q.getProgress(), 0.0001);
@@ -34,8 +36,8 @@ public class AsyncToSyncPipeTest {
 
   @Test
   public void testSuccessfulEnd() throws Exception {
-    try (DummyAsyncPipe ap = new DummyAsyncPipe(0, 100, true);
-        AsyncToSyncPipe<Integer> a2q = new AsyncToSyncPipe<>(ap, 10, () -> new Integer(0))) {
+    try (AsyncPipe<Integer> ap = new DummyAsyncPipe(0, 100, true);
+        Pipe<Integer> a2q = new AsyncToSyncPipe<>(ap, 10)) {
       a2q.start();
       
       Integer next;
@@ -50,8 +52,8 @@ public class AsyncToSyncPipeTest {
 
   @Test
   public void testUnsuccessfulEnd() throws Exception {
-    try (DummyAsyncPipe ap = new DummyAsyncPipe(0, 100, false);
-        AsyncToSyncPipe<Integer> a2q = new AsyncToSyncPipe<Integer>(ap, 10, () -> new Integer(0))) {
+    try (AsyncPipe<Integer> ap = new DummyAsyncPipe(0, 100, false);
+        Pipe<Integer> a2q = new AsyncToSyncPipe<>(ap, 10)) {
       a2q.start();
       
       Integer next;
@@ -60,11 +62,25 @@ public class AsyncToSyncPipeTest {
         while ((next = a2q.next()) != null) {
           all.add(next);
         }
-      } catch (ValidationPipeException e) {
+      } catch (PipeException e) {
         assertEquals(IntStream.range(0, 100).boxed().collect(Collectors.toSet()), all);  
         return;
       }
       fail("Expected an exception");
     }
   }
+
+  @Test
+  public void testPeek() throws Exception {
+    try (AsyncPipe<Integer> ap = new DummyAsyncPipe(1, 1, true);
+        Pipe<Integer> a2q = new AsyncToSyncPipe<>(ap, 10)) {
+      a2q.start();
+
+      assertEquals(1, a2q.peek());
+      assertEquals(1, a2q.next());
+      assertNull(a2q.peek());
+      assertNull(a2q.next());
+    }
+  }
+
 }
