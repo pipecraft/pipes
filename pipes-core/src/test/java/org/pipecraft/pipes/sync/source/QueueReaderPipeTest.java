@@ -1,6 +1,7 @@
 package org.pipecraft.pipes.sync.source;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 import org.pipecraft.pipes.exceptions.QueuePipeException;
+import org.pipecraft.pipes.sync.Pipe;
 import org.pipecraft.pipes.terminal.CollectionWriterPipe;
 import org.pipecraft.pipes.utils.QueueItem;
 
@@ -25,12 +27,11 @@ public class QueueReaderPipeTest {
     queue.add(QueueItem.end());
     
     try (
-      QueueReaderPipe<Integer> qrp = new QueueReaderPipe<>(queue);
+      Pipe<Integer> qrp = new QueueReaderPipe<>(queue);
       CollectionWriterPipe<Integer> wp = new CollectionWriterPipe<>(qrp)
     ) {
       wp.start();
       assertEquals(Lists.newArrayList(0, 1, 2), wp.getItems());
-      
     }
   }
   
@@ -43,7 +44,7 @@ public class QueueReaderPipeTest {
     queue.add(ERROR_MARKER);
     
     try (
-      QueueReaderPipe<Integer> qrp = new QueueReaderPipe<>(queue)
+      Pipe<Integer> qrp = new QueueReaderPipe<>(queue)
     ) {
       qrp.start();
       assertEquals(0, qrp.next());
@@ -52,5 +53,20 @@ public class QueueReaderPipeTest {
       assertThrows(QueuePipeException.class, qrp::next);
     }
   }
+
+  @Test
+  public void testPeek() throws Exception {
+    ArrayBlockingQueue<QueueItem<Integer>> queue = new ArrayBlockingQueue<>(10);
+    queue.add(QueueItem.of(10));
+    queue.add(QueueItem.end());
+
+    try (Pipe<Integer> qrp = new QueueReaderPipe<>(queue)) {
+      qrp.start();
+      assertEquals(10, qrp.peek());
+      assertEquals(10, qrp.next());
+      assertNull(qrp.next());
+    }
+  }
+
 
 }

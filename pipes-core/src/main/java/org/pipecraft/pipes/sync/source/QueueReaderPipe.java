@@ -21,8 +21,6 @@ import org.pipecraft.pipes.utils.QueueItem;
 public class QueueReaderPipe <T> implements Pipe<T> {
   private final BlockingQueue<QueueItem<T>> queue;
   private boolean complete;
-  private T next;
-  private PipeException exception;
 
   /**
    * Constructor
@@ -51,7 +49,6 @@ public class QueueReaderPipe <T> implements Pipe<T> {
   
   @Override
   public void start() throws PipeException, InterruptedException {
-    prepareNext();
   }
 
   @Override
@@ -69,38 +66,43 @@ public class QueueReaderPipe <T> implements Pipe<T> {
   // Throws QueuePipeException in case of a producer signaled error
   @Override
   public T next() throws PipeException, InterruptedException {
-    if (exception != null) {
-      throw exception;
+    if (complete) {
+      return null;
     }
-    T toReturn = next;
-    prepareNext();
-    return toReturn;
+
+    QueueItem<T> queueItem = queue.take();
+    if (queueItem.isSuccessfulEndOfData()) {
+      complete = true;
+      return null;
+    }
+    Throwable e = queueItem.getThrowable();
+    if (e != null) {
+      complete = true;
+      throw new QueuePipeException("Error signaled by queue producer", e);
+    }
+
+    return queueItem.getItem();
   }
 
 
   @Override
   public T peek() throws PipeException {
-    if (exception != null) {
-      throw exception;
-    }
-    return next;
-  }
-
-  public void prepareNext() throws InterruptedException {
-    if (!complete) {
-      QueueItem<T> queueItem = queue.take();
-      if (queueItem.isSuccessfulEndOfData()) {
-        complete = true;
-        next = null;
-      } else {
-        Throwable e = queueItem.getThrowable();
-        if (e != null) {
-          complete = true;
-          exception = new QueuePipeException("Error signaled by queue producer", e);
-        } else {
-          this.next = queueItem.getItem();
-        }
+    try {
+      QueueItem<T> itemW;
+      while ((itemW = queue.peek()) == null) {
+        Thread.sleep(10); // We have no choice but to block here. A returned value of null would be incorrect because it means end of data in Pipes.
       }
+      if (itemW.isSuccessfulEndOfData()) {
+        return null;
+      }
+      Throwable e = itemW.getThrowable();
+      if (e != null) {
+        throw new QueuePipeException("Error signaled by queue producer", e);
+      }
+      return itemW.getItem();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt(); // The peek() API doesn't allow propagating the exception. We exit immediately and mark the thread as interrupted instead.
+      return null;
     }
   }
 

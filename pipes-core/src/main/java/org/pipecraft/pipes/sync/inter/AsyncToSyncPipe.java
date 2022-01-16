@@ -104,12 +104,12 @@ public class AsyncToSyncPipe<T> implements Pipe<T> {
     QueueItem<T> itemW = queue.take();
     if (itemW.isSuccessfulEndOfData()) {
       done = true;
-    } else {
-      Throwable e = itemW.getThrowable();
-      if (e != null) {
-        done = true;
-        throw new QueuePipeException("Error signaled by queue producer", e);
-      }
+      return null;
+    }
+    Throwable e = itemW.getThrowable();
+    if (e != null) {
+      done = true;
+      throw new QueuePipeException("Error signaled by queue producer", e);
     }
     return itemW.getItem();
   }
@@ -121,15 +121,18 @@ public class AsyncToSyncPipe<T> implements Pipe<T> {
       while ((itemW = queue.peek()) == null) {
         Thread.sleep(10); // We have no choice but to block here. A returned value of null would be incorrect because it means end of data in Pipes.
       }
-      if (itemW.isSuccessfulEndOfData() || itemW.getThrowable() != null) {
+      if (itemW.isSuccessfulEndOfData()) {
         return null;
+      }
+      Throwable e = itemW.getThrowable();
+      if (e != null) {
+        throw new QueuePipeException("Error signaled by queue producer", e);
       }
       return itemW.getItem();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt(); // The peek() API doesn't allow propagating the exception. We exit immediately and mark the thread as interrupted instead.
       return null;
     }
-
   }
 
   private class Listener implements AsyncPipeListener<T> {
