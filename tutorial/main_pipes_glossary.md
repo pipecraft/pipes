@@ -202,7 +202,7 @@ The configuration class accepts the generic Bucket and storage classes, meaning 
 
 **QueuePipe** - A synchronous pipe actively fetching items from the upstream pipe, storing in a queue, and making them available to the caller. Producer side is handled by a new, dedicated thread, while consuming is performed by the caller's thread (the thread calling start() and pull() on this pipe). The pipe breaks the flow into two parts, each handled by a different thread. For better throughput, consider using LockFreeBlockingQueue as the queue implementation.
 
-###Combiner Pipes
+### Combiner Pipes
 **AsyncUnionPipe** - An async pipe producing items from all given async input pipes. This is only a flow structural change, allowing to "collapse" a few pipes into a single one. The items are unchanged. This is useful when we need to pass outputs of different async pipes to another pipe, but that pipe accepts a single async pipe.
 
 ---
