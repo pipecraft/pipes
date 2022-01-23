@@ -1,7 +1,7 @@
 # General Tips
 
 ## Optimizations
-* Distinguish between flow assembling code which occurs one time and may not be extra efficient, and flow execution. Specifically, pay attention to operations performed on every single item passing through the pipes, and try to make them as efficient as possible. Although it's tempting to use features such as regex, java streams, JDK's date parsing or the String.split() method, it's not recommended to use them for item level operations when there is an alternatives, due to CPU costs. Among other things, this tip applies to mapping method passed to the MapPipe, and filter predicate passed to FilterPipe.
+* Distinguish between flow assembling code, which occurs only once and may not be extra efficient, and the flow execution itself. Specifically, pay attention to operations performed on every single item passing through the pipes, and try to make them as efficient as possible. Although it's tempting to use features such as regex, java streams, JDK's date parsing or the String.split() method, it's not recommended to use them for item level operations when there is an alternatives, due to CPU costs. Among other things, this tip applies to mapping method passed to the MapPipe, and filter predicate passed to FilterPipe.
 
 * Consider avoiding expensive validations, provided that the code will fail-fast anyway with an exception. Although the error is not necessarily appropriate to be presented as a runtime exception, you may benefit from less CPU usage.
 
@@ -11,6 +11,7 @@
 
 * When implementing Encoder/Decoder factories, remember to override newByteArrayEncoder/Decoder(..) if relevant, because the default implementation isn't optimal. In addition, make your ItemEncoder/ItemDecoder implementations stateful, re-using objects/buffers where possible. 
 
+* A single threaded flow which involved IO reads and IO writes at the end can benefit from a QueuePipe. This will allow one thread to work on IO reads and decoding, and the other to work on encoding and IO writes. 
 
 ## Distributed pipelines
 There is no simple answer to when distributed pipelines are needed. As a rough rule, we recommend following the **20GB** and **1TB** as thresholds. Any pipeline reading less than 20GB of data (uncompressed) should be single-machined, and pipelines reading 1TB or more of uncompressed data should probably be distributed. For the intermediate range, it really depends on the pipeline, its complexity and the requirements. One may still find it useful to choose a simple single/multi-threaded solution rather than a distributed solution for pipelines that don't have strict run time requirements, and can take several hours to complete.

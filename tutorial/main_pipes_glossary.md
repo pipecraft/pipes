@@ -22,7 +22,7 @@
 
 ---
 
-**QueueReaderPipe** - Reads the contents of a given blocking pipe. Can work well with AsyncEnqueuingSharderPipe. Besides standard queue implementations, consider using LockFreeBlockingQueue implementation.
+**QueueReaderPipe** - Reads the contents of a given blocking queue. Can work well with AsyncEnqueuingSharderPipe. Besides standard queue implementations, consider using LockFreeBlockingQueue implementation.
 
 ---
 
@@ -111,6 +111,8 @@ The configuration class accepts the generic Bucket and storage classes, meaning 
 
 **WriterPipe** - A general purpose text writer pipe, receiving a Writer in the constructor. Supports buffering.
 
+**QueueWriterPipe** - Reads items from a synchronous pipe, and writes them to a blocking queue.
+
 ## Intermediate Pipes
 ### Data/multiplicity/order changing
 **FilterPipe/AsyncFilterPipe** - Filters items based on some given predicate.
@@ -193,6 +195,8 @@ The configuration class accepts the generic Bucket and storage classes, meaning 
 ---
 
 **OrderValidationPipe** - Validates that items supplied by the input pipe maintain the ordering specified in a given Comparator.
+
+**QueuePipe** - A synchronous pipe actively fetching items from the upstream pipe, storing in a queue, and making them available to the caller. Producer side is handled by a new, dedicated thread, while consuming is performed by the caller's thread (the thread calling start() and pull() on this pipe). The pipe breaks the flow into two parts, each handled by a different thread. For better throughput, consider using LockFreeBlockingQueue as the queue implementation.
 
 ###Combiner Pipes
 **AsyncUnionPipe** - An async pipe producing items from all given async input pipes. This is only a flow structural change, allowing to "collapse" a few pipes into a single one. The items are unchanged. This is useful when we need to pass outputs of different async pipes to another pipe, but that pipe accepts a single async pipe.
