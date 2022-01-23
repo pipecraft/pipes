@@ -6,7 +6,7 @@
 
   <groupId>org.pipecraft.pipes</groupId>
   <artifactId>pipes-amazon-s3</artifactId>
-  <version>0.91-SNAPSHOT</version>
+  <version>0.91</version>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>An Amazon S3 extension for pipes</description>
