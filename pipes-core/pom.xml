@@ -6,7 +6,7 @@
 
   <groupId>org.pipecraft.pipes</groupId>
   <artifactId>pipes-core</artifactId>
-  <version>0.91</version>
+  <version>0.92-SNAPSHOT</version>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>The core part of Pipes framework</description>
