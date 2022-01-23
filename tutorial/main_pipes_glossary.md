@@ -111,6 +111,8 @@ The configuration class accepts the generic Bucket and storage classes, meaning 
 
 **WriterPipe** - A general purpose text writer pipe, receiving a Writer in the constructor. Supports buffering.
 
+---
+
 **QueueWriterPipe** - Reads items from a synchronous pipe, and writes them to a blocking queue.
 
 ## Intermediate Pipes
@@ -195,6 +197,8 @@ The configuration class accepts the generic Bucket and storage classes, meaning 
 ---
 
 **OrderValidationPipe** - Validates that items supplied by the input pipe maintain the ordering specified in a given Comparator.
+
+---
 
 **QueuePipe** - A synchronous pipe actively fetching items from the upstream pipe, storing in a queue, and making them available to the caller. Producer side is handled by a new, dedicated thread, while consuming is performed by the caller's thread (the thread calling start() and pull() on this pipe). The pipe breaks the flow into two parts, each handled by a different thread. For better throughput, consider using LockFreeBlockingQueue as the queue implementation.
 
