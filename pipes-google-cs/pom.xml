@@ -6,7 +6,7 @@
 
   <groupId>org.pipecraft.pipes</groupId>
   <artifactId>pipes-google-cs</artifactId>
-  <version>0.91-SNAPSHOT</version>
+  <version>0.92-SNAPSHOT</version>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>A Google Cloud Storage extension for pipes</description>

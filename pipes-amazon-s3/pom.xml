@@ -37,7 +37,7 @@
     <dependency>
       <groupId>org.pipecraft.pipes</groupId>
       <artifactId>pipes-core</artifactId>
-      <version>0.91-SNAPSHOT</version>
+      <version>0.92-SNAPSHOT</version>
     </dependency>
 
     <dependency>
