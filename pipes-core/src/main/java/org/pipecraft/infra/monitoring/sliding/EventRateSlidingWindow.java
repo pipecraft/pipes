@@ -14,7 +14,7 @@ public class EventRateSlidingWindow extends SlidingWindow<Void, AtomicInteger, L
   /**
    * Constructor 
    * 
-   * @See {@link SlidingWindow}
+   * @see {@link SlidingWindow}
    */
   public EventRateSlidingWindow(int slotsCount, int slotTime, TimeUnit slotTimeUnit, ScheduledExecutorService ex) {
     super(slotsCount, slotTime, slotTimeUnit, ex);

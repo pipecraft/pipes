@@ -33,7 +33,7 @@ public abstract class InputStreamPipe <T> implements Pipe<T> {
   /**
    * Constructor
    * 
-   * @param bufferSizeBytes The requires buffer size, if <= 0 we don't use a buffer
+   * @param bufferSizeBytes The required buffer size, if &lt;= 0 we don't use a buffer
    * @param compression Compression type
    */
   public InputStreamPipe(int bufferSizeBytes, Compression compression) {

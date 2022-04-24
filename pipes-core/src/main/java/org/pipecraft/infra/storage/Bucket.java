@@ -144,6 +144,7 @@ public abstract class Bucket<T> {
    * @throws IOException in case of an actual IO error, or if the given key is illegal. A path ending with '/'
    * is considered to be illegal here, because it follows the folder naming convention.
    * @throws FileAlreadyExistsException In case that allowOverride is on and supported, and the target file already exists
+   * @throws UnsupportedOperationException In case that an exclusive write was requested but the implementation doesn't support this feature
    */
   public abstract void put(String key, InputStream input, long length, String contentType, boolean isPublic, boolean allowOverride) throws IOException;
 
@@ -225,7 +226,7 @@ public abstract class Bucket<T> {
    * @param folderPath The remote folder path. Treated as a folder path anyway - the called may or may not
    * add a '/' to the path.
    * @return The full path (relative to the bucket) of the new remote _DONE file
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public String putDoneFile(String folderPath) throws IOException {
     String key = PathUtils.buildPath(folderPath, DONE_FILE_NAME);
@@ -243,7 +244,7 @@ public abstract class Bucket<T> {
    * and the stream is closed by the caller. The written data will override the existing remote file, if exists, in an atomic manner.
    * The output stream is not allowed to throw runtime exceptions for IO errors while writing - only {@link IOException}s are allowed.
    * @throws IOException in case of a write error, or if the supplied key has a form of a folder rather than a file
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException In case that the implementation doesn't support this optional operation
    */
   public OutputStream getOutputStream(String key) throws IOException {
     return getOutputStream(key, 0);
@@ -260,7 +261,7 @@ public abstract class Bucket<T> {
    * and the stream is closed by the caller. The written data will override the existing remote file, if exists, in an atomic manner.
    * The output stream is not allowed to throw runtime exceptions for IO errors while writing - only {@link IOException}s are allowed.
    * @throws IOException in case of a write error, or if the supplied key has a form of a folder rather than a file
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException In case that the implementation doesn't support this optional operation
    */
   public abstract OutputStream getOutputStream(String key, int chunkSize) throws IOException;
 
@@ -322,7 +323,7 @@ public abstract class Bucket<T> {
    * @param contentType content mime-type (e.g. "image/jpeg"). Not mandatory, may be null.
    * @return The full path (relative to the bucket) of the generated file.
    * The file name itself is composed of a generated character sequence, with no extension.
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public String putUniquePublic(String folderPath, InputStream input, long length, String contentType) throws IOException {
     return putUniquePublic(folderPath, input, null, length, contentType);
@@ -345,7 +346,7 @@ public abstract class Bucket<T> {
    * @return The full path (relative to the bucket) of the generated file.
    * The file name itself is composed of a generated character sequence, ending with the given extension
    * (if non-null).
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public String putUniquePublic(String folderPath, InputStream input, String extension, long length, String contentType) throws IOException {
     if (extension == null) {
@@ -414,7 +415,7 @@ public abstract class Bucket<T> {
    * @param contentType content mime-type (e.g. "image/jpeg"). Not mandatory, may be null.
    * @return The full path (relative to the bucket) of the generated file.
    * The file name itself is composed of a generated character sequence, with no extension.
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public String putUniquePrivate(String folderPath, InputStream input, long length, String contentType) throws IOException {
     return putUniquePrivate(folderPath, input, null, length, contentType);
@@ -437,7 +438,7 @@ public abstract class Bucket<T> {
    * @return The full path (relative to the bucket) of the generated file.
    * The file name itself is composed of a generated character sequence, ending with the given extension
    * (if non-null).
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public String putUniquePrivate(String folderPath, InputStream input, String extension, long length, String contentType) throws IOException {
     if (extension == null) {
@@ -541,7 +542,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException In case of IO error while uploading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted during the operation
    */
   public void putAllRecursiveInterruptibly(String targetFolder, File inputFolder, int parallelism, boolean isPublic, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     String finalPath = normalizeFolderPath(targetFolder);
@@ -570,7 +571,7 @@ public abstract class Bucket<T> {
    * @param isPublic true to set public file access, false for private. Not all implementations support public, so this
    * parameter may be ignored.
    * @throws IOException In case of IO error while uploading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted during the operation
    */
   public void putAllRecursiveInterruptibly(String targetFolder, File inputFolder, int parallelism, boolean isPublic) throws IOException, InterruptedException {
     putAllRecursiveInterruptibly(targetFolder, inputFolder, parallelism, isPublic, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -616,7 +617,7 @@ public abstract class Bucket<T> {
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of IO error while reading the file or writing to the target file.
    * This includes non-existing folder in the local file path.
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted during the operation
    */
   public void getSliced(String key, File output, int chunkSize) throws IOException, InterruptedException {
     get(key, output);
@@ -654,7 +655,7 @@ public abstract class Bucket<T> {
    * Note that this stream is a {@link SizedInputStream}, therefore it provides the data size.
    * The stream is aware of any RuntimeException thrown by the underlying cloud library,
    * and convents it to a proper IOException. The returned stream isn't buffered.
-   * @throws IOException
+   * @throws IOException In case of a read error
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    */
   public abstract SizedInputStream getAsStream(T meta, int chunkSize) throws IOException;
@@ -667,7 +668,7 @@ public abstract class Bucket<T> {
    * Note that this stream is a {@link SizedInputStream}, therefore it provides the data size.
    * The stream is aware of any RuntimeException thrown by the underlying cloud library,
    * and convent it a proper IOException. The returned stream isn't buffered.
-   * @throws IOException
+   * @throws IOException In case of a read error
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    */
   public SizedInputStream getAsStream(String key) throws IOException {
@@ -682,7 +683,7 @@ public abstract class Bucket<T> {
    * Note that this stream is a {@link SizedInputStream}, therefore it provides the data size.
    * The stream is aware of any RuntimeException thrown by the underlying cloud library,
    * and convent it a proper IOException. The returned stream isn't buffered.
-   * @throws IOException
+   * @throws IOException In case of a read error
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    */
   public SizedInputStream getAsStream(T meta) throws IOException {
@@ -700,7 +701,7 @@ public abstract class Bucket<T> {
    * Note that this stream is a {@link SizedInputStream}, therefore it provides the data size.
    * The stream is aware of any RuntimeException thrown by the underlying cloud library,
    * and convent it a proper IOException. The returned stream isn't buffered.
-   * @throws IOException
+   * @throws IOException In case of a read error
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    */
   public SizedInputStream getAsStream(String key, int chunkSize) throws IOException {
@@ -737,7 +738,7 @@ public abstract class Bucket<T> {
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of IO error while reading the file or writing to local file.
    * This includes non-existing folder in the local file path.
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void getInterruptibly(String key, File output, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     T meta = getObjectMetadata(key);
@@ -756,7 +757,7 @@ public abstract class Bucket<T> {
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of IO error while reading the file or writing to local file.
    * This includes non-existing folder in the local file path.
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void getInterruptibly(T meta, File output, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Retrier.run(() -> get(meta, output),
@@ -773,7 +774,7 @@ public abstract class Bucket<T> {
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of IO error while reading the file or writing to local file.
    * This includes non-existing folder in the local file path.
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void getInterruptibly(String key, File output) throws IOException, InterruptedException {
     T meta = getObjectMetadata(key);
@@ -790,7 +791,7 @@ public abstract class Bucket<T> {
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of IO error while reading the file or writing to local file.
    * This includes non-existing folder in the local file path.
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void getInterruptibly(T meta, File output) throws IOException, InterruptedException {
     getInterruptibly(meta, output, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -806,7 +807,7 @@ public abstract class Bucket<T> {
    * @param parallelism The number of threads to use for the task
    * @return The set of downloaded  file objects
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(String folderPath, File targetFolder, int parallelism) throws IOException, InterruptedException {
     return getAllRegularFilesInterruptibly(folderPath, b -> true, targetFolder, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -827,7 +828,7 @@ public abstract class Bucket<T> {
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @return The set of downloaded  file objects
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(String folderPath, Predicate<T> predicate, File targetFolder, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     folderPath = normalizeFolderPath(folderPath);
@@ -850,7 +851,7 @@ public abstract class Bucket<T> {
    * @param parallelism The number of threads to use for the task
    * @return The set of downloaded  file objects
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(String folderPath, Predicate<T> predicate, File targetFolder, int parallelism) throws IOException, InterruptedException {
     return getAllRegularFilesInterruptibly(folderPath, predicate, targetFolder, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -892,7 +893,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(Collection<String> cloudFilePaths, File targetFolder, Function<String, String> fileNameResolver, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Map<String, T> metaObjs = getObjectMetadata(cloudFilePaths,maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -914,7 +915,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(Collection<String> cloudFilePaths, File targetFolder, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     return getAllRegularFilesInterruptibly(cloudFilePaths, targetFolder, DEFAULT_FILE_NAME_RESOLVER, parallelism, maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -933,7 +934,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(Collection<String> cloudFilePaths, File targetFolder, Function<String, String> fileNameResolver, int parallelism) throws IOException, InterruptedException {
     return getAllRegularFilesInterruptibly(cloudFilePaths, targetFolder, fileNameResolver, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -951,7 +952,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesInterruptibly(Collection<String> filePaths, File targetFolder, int parallelism) throws IOException, InterruptedException {
     return getAllRegularFilesInterruptibly(filePaths, targetFolder, DEFAULT_FILE_NAME_RESOLVER, parallelism);
@@ -972,7 +973,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesByMetaInterruptibly(Collection<T> metaObjects, File targetFolder, Function<String, String> fileNameResolver, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     targetFolder.mkdirs();
@@ -1004,7 +1005,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesByMetaInterruptibly(Collection<T> metaObjects, File targetFolder, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     return getAllRegularFilesByMetaInterruptibly(metaObjects, targetFolder, DEFAULT_FILE_NAME_RESOLVER, parallelism, maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -1023,7 +1024,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesByMetaInterruptibly(Collection<T> metaObjects, File targetFolder, Function<String, String> fileNameResolver, int parallelism) throws IOException, InterruptedException {
     return getAllRegularFilesByMetaInterruptibly(metaObjects, targetFolder, fileNameResolver, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1041,7 +1042,7 @@ public abstract class Bucket<T> {
    * @return The set of downloaded file objects
    * @throws FileNotFoundException In case that the one of the paths wasn't found in the bucket
    * @throws IOException In case of IO error while downloading the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public Set<File> getAllRegularFilesByMetaInterruptibly(Collection<T> metaObjects, File targetFolder, int parallelism) throws IOException, InterruptedException {
     return getAllRegularFilesByMetaInterruptibly(metaObjects, targetFolder, DEFAULT_FILE_NAME_RESOLVER, parallelism);
@@ -1054,7 +1055,7 @@ public abstract class Bucket<T> {
    * @param toBucket The name of the target bucket (may be the current bucket name)
    * @param toKey The path of the target file, relative to the target bucket.
    * Overridden if exists.
-   * @throws IOException
+   * @throws IOException In case of a read/write error
    */
   public abstract void copyToAnotherBucket(String fromKey, String toBucket, String toKey) throws IOException;
 
@@ -1063,7 +1064,7 @@ public abstract class Bucket<T> {
    *
    * @param fromKey The path of the source file, relative to this bucket
    * @param toKey The path of the target file, relative to this bucket
-   * @throws IOException
+   * @throws IOException In case of a read/write error
    */
   public void copy(String fromKey, String toKey) throws IOException {
     copyToAnotherBucket(fromKey, getBucketName(), toKey);
@@ -1079,7 +1080,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException in case the client or the service has failed
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyInterruptibly(String fromKey, String toKey, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Retrier.run(() -> {
@@ -1094,7 +1095,7 @@ public abstract class Bucket<T> {
    * @param fromKey The path of the source file, relative to this bucket
    * @param toKey The path of the target file, relative to this bucket
    * @throws IOException in case the client or the service has failed
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyInterruptibly(String fromKey, String toKey) throws IOException, InterruptedException {
     copyInterruptibly(fromKey, toKey, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1110,7 +1111,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException in case the client or the service has failed
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyToAnotherBucketInterruptibly(String fromKey, String toBucket, String toKey, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Retrier.run(() -> {
@@ -1126,7 +1127,7 @@ public abstract class Bucket<T> {
    * @param toBucket The name of the target bucket
    * @param toKey The path of the target file, relative to the target bucket
    * @throws IOException in case the client or the service has failed
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyToAnotherBucketInterruptibly(String fromKey, String toBucket, String toKey) throws IOException, InterruptedException {
     copyToAnotherBucketInterruptibly(fromKey, toBucket, toKey, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1146,7 +1147,7 @@ public abstract class Bucket<T> {
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of error copying the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyFolderRecursiveInterruptibly(String srcPath, String dstPath, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     String srcPathNorm = normalizeFolderPath(srcPath);
@@ -1173,7 +1174,7 @@ public abstract class Bucket<T> {
    * @param parallelism The number of threads to use for the task
    * @throws FileNotFoundException In case that the key wasn't found in the bucket
    * @throws IOException In case of error copying the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyFolderRecursiveInterruptibly(String srcPath, String dstPath, int parallelism) throws IOException, InterruptedException {
     copyFolderRecursiveInterruptibly(srcPath, dstPath, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1182,7 +1183,7 @@ public abstract class Bucket<T> {
   /**
    * Deletes a single object. Nothing happens and no exception is thrown in case the file doesn't exist.
    *
-   * @throws IOException
+   * @throws IOException In case of an IO error
    * @param objectMeta The metadata object pointing to the remote file to be deleted
    */
   public abstract void delete(T objectMeta) throws IOException;
@@ -1191,7 +1192,7 @@ public abstract class Bucket<T> {
    * Deletes a single object. Nothing is done in case the file doesn't exist.
    *
    * @param key The path of the remote file, relative to the bucket
-   * @throws IOException
+   * @throws IOException In case of an IO error
    */
   public void delete(String key) throws IOException {
     try {
@@ -1209,8 +1210,8 @@ public abstract class Bucket<T> {
    * @param maxRetries Maximum number of retries in case of IOException (except for {@link FileNotFoundException} which won't trigger retries).
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException In case of an IO error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteInterruptibly(String key, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Retrier.run(() -> delete(key), initialRetrySleepSec * 1000, waitTimeFactor, maxRetries + 1);
@@ -1223,8 +1224,8 @@ public abstract class Bucket<T> {
    * @param maxRetries Maximum number of retries in case of IOException (except for {@link FileNotFoundException} which won't trigger retries).
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException In case of an IO error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteInterruptibly(T objectMeta, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Retrier.run(() -> delete(objectMeta), initialRetrySleepSec * 1000, waitTimeFactor, maxRetries + 1);
@@ -1235,8 +1236,8 @@ public abstract class Bucket<T> {
    * Uses default retry settings.
    *
    * @param key The path of the remote file, relative to the bucket
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException In case of an IO error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteInterruptibly(String key) throws IOException, InterruptedException {
     deleteInterruptibly(key, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1247,8 +1248,8 @@ public abstract class Bucket<T> {
    * Uses default retry settings.
    *
    * @param objectMeta The metadata object pointing to the remote file to be deleted
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException In case of an IO error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteInterruptibly(T objectMeta) throws IOException, InterruptedException {
     deleteInterruptibly(objectMeta, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1259,7 +1260,7 @@ public abstract class Bucket<T> {
    *
    * @param path A path to a folder, relative to the bucket.
    * The path is treated as a folder anyway, regardless of whether the suffix is '/' or not.
-   * @throws IOException
+   * @throws IOException In case of an IO error
    */
   public void deleteFolderRegularFiles(String path) throws IOException {
     path = normalizeFolderPath(path);
@@ -1287,7 +1288,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteFolderRecursiveInterruptibly(String path, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Iterator<T> it = listFilesRecursive(normalizeFolderPath(path));
@@ -1308,7 +1309,7 @@ public abstract class Bucket<T> {
    * The path is treated as a folder anyway, regardless of whether the suffix is '/' or not.
    * @param parallelism The number of threads to use for the task
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteFolderRecursiveInterruptibly(String path, int parallelism) throws IOException, InterruptedException {
     deleteFolderRecursiveInterruptibly(path, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1330,7 +1331,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllByMetaInterruptibly(Iterator<T> fileRefsIt, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     List<T> pathsChunk = new ArrayList<>();
@@ -1358,7 +1359,7 @@ public abstract class Bucket<T> {
    * @param fileRefsIt An iterator on file references of all files to delete.
    * @param parallelism The number of threads to use for the task
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllByMetaInterruptibly(Iterator<T> fileRefsIt, int parallelism) throws IOException, InterruptedException {
     deleteAllByMetaInterruptibly(fileRefsIt, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1379,7 +1380,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllByMetaInterruptibly(Collection<T> fileRefs, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     ParallelTaskProcessor.runFailable(fileRefs, parallelism, m -> {
@@ -1400,7 +1401,7 @@ public abstract class Bucket<T> {
    * @param fileRefs The metadata objects pointing to all bucket files to delete
    * @param parallelism The number of threads to use for the task
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllByMetaInterruptibly(Collection<T> fileRefs, int parallelism) throws IOException, InterruptedException {
     deleteAllByMetaInterruptibly(fileRefs, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1422,7 +1423,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllInterruptibly(Iterator<String> filePathsIt, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     List<String> pathsChunk = new ArrayList<>();
@@ -1452,7 +1453,7 @@ public abstract class Bucket<T> {
    * @param filePathsIt An iterator on paths of all files to delete. Paths are relative to the bucket.
    * @param parallelism The number of threads to use for the task
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllInterruptibly(Iterator<String> filePathsIt, int parallelism) throws IOException, InterruptedException {
     deleteAllInterruptibly(filePathsIt, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1473,7 +1474,7 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllInterruptibly(Collection<String> filePaths, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     Map<String, T> metaObjs = getObjectMetadata(filePaths, maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -1494,7 +1495,7 @@ public abstract class Bucket<T> {
    * @param filePaths The paths of all files to delete, relative to the bucket
    * @param parallelism The number of threads to use for the task
    * @throws IOException In case of IO error while deleting the files
-   * @throws InterruptedException
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllInterruptibly(Collection<String> filePaths, int parallelism) throws IOException, InterruptedException {
     deleteAllInterruptibly(filePaths, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1511,8 +1512,8 @@ public abstract class Bucket<T> {
    * @param maxRetries Maximum number of retries in case of IOException (except for {@link FileNotFoundException} which won't trigger retries).
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException In case of a read/write error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void moveInterruptibly(String fromKey, String toKey, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     copyToAnotherBucketInterruptibly(fromKey, getBucketName(), toKey, maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -1528,8 +1529,8 @@ public abstract class Bucket<T> {
    *
    * @param fromKey The path of the source file, relative to the bucket
    * @param toKey The path of the target file, relative to the bucket
-   * @throws IOException in case the client or the service has failed
-   * @throws InterruptedException
+   * @throws IOException in case of a read/write error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void moveInterruptibly(String fromKey, String toKey) throws IOException, InterruptedException {
     moveInterruptibly(fromKey, toKey, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1548,8 +1549,8 @@ public abstract class Bucket<T> {
    * @param initialRetrySleepSec The initial number of seconds to sleep before the first retry
    * @param waitTimeFactor A factor by which the sleep times between retries increases (millisecond precision)
    * @param parallelism The number of threads to use for the task
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException in case of a read/write error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void moveFolderRecursive(String srcPath, String dstPath, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     copyFolderRecursiveInterruptibly(srcPath, dstPath, parallelism, maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -1567,8 +1568,8 @@ public abstract class Bucket<T> {
    * @param dstPath The path to the destination folder, relative to the bucket.
    * The path is treated as a folder anyway, regardless of whether the suffix is '/' or not.
    * @param parallelism The number of threads to use for the task
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException in case of a read/write error
+   * @throws InterruptedException In case that the current thread is interrupted
    */
   public void moveFolderRecursive(String srcPath, String dstPath, int parallelism) throws IOException, InterruptedException {
     moveFolderRecursive(srcPath, dstPath, parallelism, DEFAULT_RETRY_MAX_ATTEMPTS, DEFAULT_RETRY_INITIAL_SLEEP_SEC, DEFAULT_RETRY_WAIT_TIME_FACTOR);
@@ -1803,7 +1804,7 @@ public abstract class Bucket<T> {
 
   /**
    * @param objMetadata A metadata of an object under the bucket
-   * @return The path of the object represented by this metadata (relative to the bucket).
+   * @return The path of the object represented by this metadata (relative to the bucket). The path always uses '/' as folder separator.
    * In case that the metadata object represents a folder (and only in this case), the path should be terminated with '/'.
    * In case the metadata indicates the object doesn't belong to the current bucket, {@link IllegalArgumentException} is thrown.
    */

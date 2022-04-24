@@ -59,9 +59,9 @@ public class RetrierTest {
     List<Long> runTimes = r.getRunTimes();
     assertEquals(4, runTimes.size());
     
-    assertEquals(1.0, (runTimes.get(1)-runTimes.get(0)) / 100.0, 0.1);
-    assertEquals(1.0, (runTimes.get(2)-runTimes.get(1)) / 200.0, 0.1);
-    assertEquals(1.0, (runTimes.get(3)-runTimes.get(2)) / 400.0, 0.1);
+    assertEquals(1.0, (runTimes.get(1)-runTimes.get(0)) / 100.0, 0.5);
+    assertEquals(2.0, (runTimes.get(2)-runTimes.get(1)) / 100.0, 0.5);
+    assertEquals(4.0, (runTimes.get(3)-runTimes.get(2)) / 100.0, 0.5);
   }
 
   @Test

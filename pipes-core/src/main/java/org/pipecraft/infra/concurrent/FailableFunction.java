@@ -24,8 +24,9 @@ public interface FailableFunction <T, R, E extends Exception> {
   
   /**
    * Similar to Function.compose(..), but works with {@link FailableFunction}
-   * @param before
-   * @return
+   * @param before the function to apply before this function is applied
+   * @return a composed {@link FailableFunction} that first applies the before function and then applies this function
+   * @param <V> The input type of the supplied function to be applied first
    */
   default <V> FailableFunction<V, R, E> compose(FailableFunction<? super V, ? extends T, E> before) {
     Objects.requireNonNull(before);
@@ -34,8 +35,9 @@ public interface FailableFunction <T, R, E extends Exception> {
 
   /**
    * Similar to Function.andThen(..), but works with {@link FailableFunction}
-   * @param after
-   * @return
+   * @param after the {@link FailableFunction} to apply after this function is applied
+   * @return a composed function that first applies this function and then applies the after function
+   * @param <V> The output type of the supplied function
    */
   default <V> FailableFunction<T, V, E> andThen(FailableFunction<? super R, ? extends V, E> after) {
     Objects.requireNonNull(after);
@@ -44,7 +46,9 @@ public interface FailableFunction <T, R, E extends Exception> {
 
   /**
    * Similar to Function.identity(), but returns a {@link FailableFunction}
-   * @return
+   * @return a function that always returns its input argument.
+   * @param <T> The input/output type
+   * @param <E> The error type
    */
   static <T, E extends Exception> FailableFunction<T, T, E> identity() {
     return t -> t;

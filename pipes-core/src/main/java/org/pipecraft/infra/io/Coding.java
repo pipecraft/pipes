@@ -53,7 +53,7 @@ public final class Coding {
    * @param buffer The buffer to read into
    * @param offset The offset in the given buffer to write from
    * @param bytesCount The number of bytes to try to read from the stream
-   * @return true if the buffer has been filled, and false if the input stream has no more bytes to read.
+   * @return true if the buffer has been filled, and false if the input stream has no bytes to read at all
    * @throws IOException In case of a read error
    * @throws EOFException if the stream isn't in EOF state prior to the call, and doesn't contain requested number of bytes either.
    */
@@ -89,7 +89,8 @@ public final class Coding {
    * Reads a 16 bit int from the input stream. LSB are assumed to comes first.
    * @param is The input stream to read from
    * @return The 16 bit int read from the input stream
-   * @throws IOException
+   * @throws IOException In case of read error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static int readLittleEndian16(InputStream is) throws IOException {
     byte[] buffer = read(is, 2);
@@ -111,7 +112,7 @@ public final class Coding {
    * Writes a 16 bit int into the output stream. LSB comes first.
    * @param v The value to write
    * @param os the output stream to write to
-   * @throws IOException
+   * @throws IOException  In case of write error
    */
   public static void writeLittleEndian16(int v, OutputStream os) throws IOException {
     os.write(v);
@@ -129,7 +130,8 @@ public final class Coding {
    * Reads a 16 bit int from the input stream. MSB are assumed to comes first.
    * @param is The input stream to read from
    * @return The 16 bit int read from the input stream
-   * @throws IOException
+   * @throws IOException In case of read error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static int readBigEndian16(InputStream is) throws IOException {
     byte[] buffer = read(is, 2);
@@ -151,7 +153,7 @@ public final class Coding {
    * Writes a 16 bit int into the output stream. MSB comes first.
    * @param v The value to write
    * @param os the output stream to write to
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public static void writeBigEndian16(int v, OutputStream os) throws IOException {
     os.write(v >> 8);
@@ -169,7 +171,8 @@ public final class Coding {
    * Reads a 32 bit int from the input stream. LSB are assumed to comes first.
    * @param is The input stream to read from
    * @return The 32 bit int read from the input stream
-   * @throws IOException
+   * @throws IOException In case of read error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static int readLittleEndian32(InputStream is) throws IOException {
     byte[] buffer = read(is, 4);
@@ -193,7 +196,7 @@ public final class Coding {
    * Writes a 32 bit int into the output stream. LSB comes first.
    * @param v The value to write
    * @param os the output stream to write to
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public static void writeLittleEndian32(int v, OutputStream os) throws IOException {
     os.write(v);
@@ -215,7 +218,8 @@ public final class Coding {
    * Reads a 32 bit int from the input stream. MSB are assumed to comes first.
    * @param is The input stream to read from
    * @return The 32 bit int read from the input stream
-   * @throws IOException
+   * @throws IOException In case of read error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static int readBigEndian32(InputStream is) throws IOException {
     byte[] buffer = read(is, 4);
@@ -239,7 +243,7 @@ public final class Coding {
    * Writes a 32 bit int into the output stream. MSB comes first.
    * @param v The value to write
    * @param os the output stream to write to
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public static void writeBigEndian32(int v, OutputStream os) throws IOException {
     os.write(v >> 24);
@@ -261,7 +265,8 @@ public final class Coding {
    * Reads a 64 bit int from the input stream. LSB are assumed to comes first.
    * @param is The input stream to read from
    * @return The 64 bit int read from the input stream
-   * @throws IOException
+   * @throws IOException In case of read error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static long readLittleEndian64(InputStream is) throws IOException {
     byte[] buffer = read(is, 8);
@@ -289,7 +294,7 @@ public final class Coding {
    * Writes a 64 bit int into the output stream. LSB comes first.
    * @param v The value to write
    * @param os the output stream to write to
-   * @throws IOException
+   * @throws IOException In case of write error
    */
   public static void writeLittleEndian64(long v, OutputStream os) throws IOException {
     os.write((int) v);
@@ -319,7 +324,8 @@ public final class Coding {
    * Reads a 64 bit int from the input stream. MSB are assumed to comes first.
    * @param is The input stream to read from
    * @return The 64 bit long read from the input stream
-   * @throws IOException In case of IO error or if no 8 bytes were found
+   * @throws IOException In case of IO error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static long readBigEndian64(InputStream is) throws IOException {
     byte[] buffer = read(is, 8);
@@ -347,7 +353,7 @@ public final class Coding {
    * Writes a 64 bit int into the output stream. MSB comes first.
    * @param v The value to write
    * @param os the output stream to write to
-   * @throws IOException
+   * @throws IOException in case of a write error
    */
   public static void writeBigEndian64(long v, OutputStream os) throws IOException {
     os.write((int) (v >> 56));
@@ -376,7 +382,7 @@ public final class Coding {
   /**
    * @param s The string to serialize
    * @param os The output stream to write to
-   * @throws IOException
+   * @throws IOException in case of a write error
    */
   public static void writeUTF8(String s, OutputStream os) throws IOException {
     byte[] byteArr = s.getBytes(StandardCharsets.UTF_8);
@@ -387,19 +393,20 @@ public final class Coding {
   /**
    * @param is The input stream to read from
    * @return The string read from the stream
-   * @throws IOException
+   * @throws IOException in case of a read error
+   * @throws EOFException if the stream doesn't contain the requested number of bytes
    */
   public static String readUTF8(InputStream is) throws IOException {
-    byte[] byteArr = Coding.read(is, Coding.readVarint32(is, new MutableInt()));
+    byte[] byteArr = read(is, readVarint32(is, new MutableInt()));
     return new String(byteArr, StandardCharsets.UTF_8);
   }
 
   /* VARINT32 routines  The following functions are adapted from protobuf package. */
   
   /**
-   * Compute the number of bytes that would be needed to encode a varint.
-   * {@code value} is treated as unsigned, so it won't be sign-extended if
+   * @param value The value to inspect the varint encoding for. Treated as unsigned, so it won't be sign-extended if
    * negative.
+   * @return the number of bytes that would be needed to encode a varint.
    */
   public static byte computeVarint32Size(final int value) {
     if ((value & (0xffffffff <<  7)) == 0) return 1;
@@ -411,11 +418,10 @@ public final class Coding {
   
   
   /**
-   * @param value
-   * @param dest
-   * @param offset
+   * @param value The value to encode
+   * @param dest The byte array to write the encoding to
+   * @param offset The offset in dest to start writing the varint from
    * @return new offset to the dest after the value was written.
-   * @throws IOException
    */
   public static int writeVarint32(int value, byte[] dest, int offset) {
     while (true) {
@@ -432,7 +438,7 @@ public final class Coding {
    * @param value The value to write
    * @param os The stream to write to. Not closed by this method.
    * @return the number of bytes written
-   * @throws IOException
+   * @throws IOException in case of a write error
    */
   public static int writeVarint32(int value, OutputStream os) throws IOException {
     byte[] buffer = new byte[5];
@@ -499,18 +505,18 @@ public final class Coding {
 
   /**
    * convert hex to byte array
-   * @param hex
+   * @param hex The hex representation, case insensitive
    * @return hex as byte array
-   * @throws DecoderException
+   * @throws DecoderException in case of an invalid hex string
    */
   public static byte[] fromHex(String hex) throws DecoderException {
     return Hex.decodeHex(hex.toCharArray());
   }
 
   /**
-   * convert byte array to hex
-   * @param raw
-   * @return String
+   * convert byte array to hex representation
+   * @param raw The byte array to encode as hex string
+   * @return The hex representation
    */
   public static String toHex(byte[] raw) {
     return Hex.encodeHexString(raw);

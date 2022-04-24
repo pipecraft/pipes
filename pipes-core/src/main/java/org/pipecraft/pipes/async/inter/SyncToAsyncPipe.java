@@ -21,6 +21,8 @@ import org.pipecraft.pipes.utils.PipeUtils;
  * The implementation makes sure to maintain thread safety of the synchronous input pipes by handling each pipe using a single thread.
  *
  * @author Eyal Schneider
+ *
+ * @param <T> The data type of items passing through this pipe
  */
 public class SyncToAsyncPipe<T> extends AsyncPipe<T> {
   private final Collection<PipeSupplier<T>> inputPipeSuppliers;
@@ -98,6 +100,7 @@ public class SyncToAsyncPipe<T> extends AsyncPipe<T> {
    * @param threadCount The number of threads to actively fetch data from the input pipes. Must not exceed the number of input pipes.
    *                    Each thread is assigned an exclusive set of pipes to read from.
    * @return A new {@link SyncToAsyncPipe} initialized with the given input pipes
+   * @param <T> The data type of items serving as input/output
    */
   public static <T> SyncToAsyncPipe<T> fromPipes(Collection<Pipe<T>> inputs, int threadCount) {
     return new SyncToAsyncPipe<>(inputs.stream().map(p -> (PipeSupplier<T>)(() -> p)).collect(Collectors.toList()), threadCount);
@@ -106,6 +109,7 @@ public class SyncToAsyncPipe<T> extends AsyncPipe<T> {
   /**
    * @param input The pipe to be fed into the {@link SyncToAsyncPipe}
    * @return A new {@link SyncToAsyncPipe} initialized with the given input pipes
+   * @param <T> The data type of items serving as input/output
    */
   public static <T> SyncToAsyncPipe<T> fromPipe(Pipe<T> input) {
     return new SyncToAsyncPipe<>(Collections.singleton(() -> input), 1);

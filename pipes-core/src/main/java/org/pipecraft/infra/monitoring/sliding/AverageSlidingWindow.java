@@ -38,7 +38,7 @@ public class AverageSlidingWindow extends SlidingWindow<Long, SlotRecord , Float
   /**
    * Constructor 
    * 
-   * @See {@link SlidingWindow}
+   * See {@link SlidingWindow}
    */
   public AverageSlidingWindow(int slotsCount, int slotTime, TimeUnit slotTimeUnit, ScheduledExecutorService ex) {
     super(slotsCount, slotTime, slotTimeUnit, ex);

@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 /**
  * An interreuptible consumer that may also fail with a checked exception during the execution of the accept(..) method.
  * 
- * @param T The type of the data being consumed
- * @param E The exception type
+ * @param <T> The type of the data being consumed
+ * @param <E> The exception type
  * 
  * @author Eyal Schneider
  */
@@ -32,6 +32,8 @@ public interface FailableInterruptibleConsumer <T,E extends Exception> {
    * Utility method for wrapping a consumer with a failable consumer
    * @param consumer The consumer to wrap
    * @return The failable consumer (which effectively never throws checked exceptions)
+   * @param <T> The type of the data being consumed
+   * @param <E> The exception type
    */
   static <T, E extends Exception> FailableInterruptibleConsumer<T,E> fromConsumer(Consumer<T> consumer) {
     return new FailableInterruptibleConsumer<T, E>() {

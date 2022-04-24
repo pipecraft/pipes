@@ -37,6 +37,7 @@ public class GraphiteClient {
    * Sends the metric to graphite, under environment root path, in the current timestamp.
    * @param key metric path
    * @param value metric value
+   * @throws GraphiteException in case of errors while trying to send metrics
    */
   public void sendMetric(String key, Number value) throws GraphiteException {
     sendMetric(key, value, getCurrentTimestamp());
@@ -46,6 +47,7 @@ public class GraphiteClient {
   /**
    * Sends the metrics to graphite, under environment root path, in the current timestamp.
    * @param metrics metric path and key map
+   * @throws GraphiteException in case of errors while trying to send metrics
    */
   public void sendMetrics(Map<String, ? extends Number> metrics) throws GraphiteException {
     sendMetrics(metrics, getCurrentTimestamp());
@@ -55,6 +57,7 @@ public class GraphiteClient {
    * Sends the metric to graphite, under environment root path
    * @param metrics metric path and key map
    * @param timestamp the timestampe, in seconds since epoch.
+   * @throws GraphiteException in case of errors while trying to send metrics
    */
   public void sendMetrics(Map<String, ? extends Number> metrics, long timestamp) throws GraphiteException {
     try (Socket socket = new Socket(host, port);
@@ -80,8 +83,8 @@ public class GraphiteClient {
    * @param key metric path
    * @param value metric value
    * @param timestamp the timestamp (in seconds since epoch)
+   * @throws GraphiteException in case of errors while trying to send metrics
    */
-  @SuppressWarnings("serial")
   public void sendMetric(final String key, final Number value, long timestamp) throws GraphiteException {
     sendMetrics(new HashMap<>() {{
       put(key, value);

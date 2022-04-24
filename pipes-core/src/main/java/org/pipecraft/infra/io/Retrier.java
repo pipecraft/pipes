@@ -105,6 +105,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public <T, E extends Exception> T run(FailableInterruptibleSupplier<T, E> toRun, Collection<Class<? extends E>> terminalErrorTypes) throws E, InterruptedException {
     return run(toRun, e -> isAnyOf(e, terminalErrorTypes));
@@ -117,6 +119,8 @@ public class Retrier implements JsonMonitorable {
    * Note that {@link RuntimeException}, {@link Error} and {@link InterruptedException} are always handled as terminal errors.
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   @SuppressWarnings("unchecked")
   public <T, E extends Exception> T run(FailableInterruptibleSupplier<T, E> toRun, Predicate<E> terminalErrorPredicate) throws E, InterruptedException {
@@ -159,6 +163,7 @@ public class Retrier implements JsonMonitorable {
    * Note that {@link RuntimeException}, {@link Error} and {@link InterruptedException} are always handled as terminal errors.
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <E> The type of the checked error that can be produced while executing the runnable
    */
   public static <E extends Exception> void runWithDefaults(FailableInterruptibleRunnable<E> toRun, Predicate<E> terminalErrorPredicate) throws E, InterruptedException {
     Retrier retrier = new Retrier(DEFAULT_INITIAL_WAIT_TIME_MS, DEFAULT_WAIT_TIME_FACTOR, DEFAULT_TIMES_TO_TRY);
@@ -173,6 +178,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the given supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public static <T, E extends Exception> T runWithDefaults(FailableInterruptibleSupplier<T, E> toRun, Predicate<E> terminalErrorPredicate) throws E, InterruptedException {
     Retrier retrier = new Retrier(DEFAULT_INITIAL_WAIT_TIME_MS, DEFAULT_WAIT_TIME_FACTOR, DEFAULT_TIMES_TO_TRY);
@@ -186,6 +193,7 @@ public class Retrier implements JsonMonitorable {
    * Note that {@link RuntimeException}, {@link Error} and {@link InterruptedException} are always handled as terminal errors.
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <E> The type of the checked error that can be produced while executing the runnable
    */
   public static <E extends Exception> void runWithDefaults(FailableInterruptibleRunnable<E> toRun, Collection<Class<? extends E>> terminalErrorTypes) throws E, InterruptedException {
     Retrier retrier = new Retrier(DEFAULT_INITIAL_WAIT_TIME_MS, DEFAULT_WAIT_TIME_FACTOR, DEFAULT_TIMES_TO_TRY);
@@ -200,6 +208,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the given supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public static <T, E extends Exception> T runWithDefaults(FailableInterruptibleSupplier<T, E> toRun, Collection<Class<? extends E>> terminalErrorTypes) throws E, InterruptedException {
     Retrier retrier = new Retrier(DEFAULT_INITIAL_WAIT_TIME_MS, DEFAULT_WAIT_TIME_FACTOR, DEFAULT_TIMES_TO_TRY);
@@ -211,6 +221,7 @@ public class Retrier implements JsonMonitorable {
    * @param toRun The failable runnable to run
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <E> The type of the checked error that can be produced while executing the runnable
    */
   public static <E extends Exception> void runWithDefaults(FailableInterruptibleRunnable<E> toRun) throws E, InterruptedException {
     Retrier retrier = new Retrier(DEFAULT_INITIAL_WAIT_TIME_MS, DEFAULT_WAIT_TIME_FACTOR, DEFAULT_TIMES_TO_TRY);
@@ -223,6 +234,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the given supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public static <T, E extends Exception> T runWithDefaults(FailableInterruptibleSupplier<T, E> toRun) throws E, InterruptedException {
     Retrier retrier = new Retrier(DEFAULT_INITIAL_WAIT_TIME_MS, DEFAULT_WAIT_TIME_FACTOR, DEFAULT_TIMES_TO_TRY);
@@ -239,6 +252,7 @@ public class Retrier implements JsonMonitorable {
    * @param timesToTry The maximum times to attempt the run
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <E> The type of the checked error that can be produced while executing the runnable
    */
   public static <E extends Exception> void run(FailableInterruptibleRunnable<E> toRun, Predicate<E> terminalErrorPredicate, int initialWaitTimeMs, double waitTimeFactor, int timesToTry) throws E, InterruptedException {
     Retrier retrier = new Retrier(initialWaitTimeMs, waitTimeFactor, timesToTry);
@@ -256,6 +270,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the given supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public static <T, E extends Exception> T run(FailableInterruptibleSupplier<T, E> toRun, Predicate<E> terminalErrorPredicate, int initialWaitTimeMs, double waitTimeFactor, int timesToTry) throws E, InterruptedException {
     Retrier retrier = new Retrier(initialWaitTimeMs, waitTimeFactor, timesToTry);
@@ -272,6 +288,7 @@ public class Retrier implements JsonMonitorable {
    * @param timesToTry The maximum times to attempt the run
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <E> The type of the checked error that can be produced while executing the runnable
    */
   public static <E extends Exception> void run(FailableInterruptibleRunnable<E> toRun, Collection<Class<? extends E>> terminalErrorTypes, int initialWaitTimeMs, double waitTimeFactor, int timesToTry) throws E, InterruptedException {
     Retrier retrier = new Retrier(initialWaitTimeMs, waitTimeFactor, timesToTry);
@@ -289,6 +306,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the given supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public static <T, E extends Exception> T run(FailableInterruptibleSupplier<T, E> toRun, Collection<Class<? extends E>> terminalErrorTypes, int initialWaitTimeMs, double waitTimeFactor, int timesToTry) throws E, InterruptedException {
     Retrier retrier = new Retrier(initialWaitTimeMs, waitTimeFactor, timesToTry);
@@ -303,6 +322,7 @@ public class Retrier implements JsonMonitorable {
    * @param timesToTry The maximum times to attempt the run. Should be greater than 1.
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <E> The type of the checked error that can be produced while executing the runnable
    */
   public static <E extends Exception> void run(FailableInterruptibleRunnable<E> toRun, int initialWaitTimeMs, double waitTimeFactor, int timesToTry) throws E, InterruptedException {
     Retrier retrier = new Retrier(initialWaitTimeMs, waitTimeFactor, timesToTry);
@@ -318,6 +338,8 @@ public class Retrier implements JsonMonitorable {
    * @return The value produced by the given supplier
    * @throws E In case of a terminal error or in case that all retries failed
    * @throws InterruptedException In case of an interruption during the retry loop
+   * @param <T> The data type of the produced output
+   * @param <E> The type of the checked error that can be produced while computing the output
    */
   public static <T, E extends Exception> T run(FailableInterruptibleSupplier<T, E> toRun, int initialWaitTimeMs, double waitTimeFactor, int timesToTry) throws E, InterruptedException {
     Retrier retrier = new Retrier(initialWaitTimeMs, waitTimeFactor, timesToTry);

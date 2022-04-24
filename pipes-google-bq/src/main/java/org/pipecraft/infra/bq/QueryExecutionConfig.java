@@ -223,7 +223,7 @@ public class QueryExecutionConfig {
     /**
      * @param maxResults The maximum number of rows to return for a single query. Null means no limit.
      * This is also referred to as the "soft limit".
-     * A query which returns more results will trigger the {@link TooManyRowsException}.
+     * A query which returns more results will trigger the {@link ClientTooManyRowsBQException}.
      * @return This builder object
      */
     public Builder setMaxResults(Long maxResults) {
@@ -234,7 +234,7 @@ public class QueryExecutionConfig {
     /**
      * @return The maximum number of rows to return for a single query. Null means no limit.
      * This is also referred to as the "soft limit".
-     * A query which returns more results will trigger the {@link TooManyRowsException}.
+     * A query which returns more results will trigger the {@link ClientTooManyRowsBQException}.
      */
     public Long getMaxResults() {
       return maxResults;

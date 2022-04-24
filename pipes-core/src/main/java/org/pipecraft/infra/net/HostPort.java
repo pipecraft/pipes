@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A util class for representing network <HOST>:<PORT> Immutable.
+ * A util class for representing a network location (host+port).
+ * Immutable.
  *
  * @author Zacharya Haitin
  */
@@ -29,7 +30,7 @@ public class HostPort implements Comparable<HostPort> {
   /**
    * CTOR.
    *
-   * @param hostPort host network string in the format <HOST>:<PORT>.
+   * @param hostPort host network string in the format "HOST:PORT".
    * @throws IllegalArgumentException if the hostPost arg is not as expected
    */
   public HostPort(String hostPort) {

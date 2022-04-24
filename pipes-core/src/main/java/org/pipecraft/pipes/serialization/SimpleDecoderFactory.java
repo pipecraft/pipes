@@ -23,7 +23,7 @@ public class SimpleDecoderFactory <T> implements DecoderFactory<T> {
   /**
    * Constructor
    * 
-   * @param statelessDecoder A function receiving a (buffered) input stream, reading & returning the next item read from it.
+   * @param statelessDecoder A function receiving a (buffered) input stream, reading and returning the next item read from it.
    */
   public SimpleDecoderFactory(FailableFunction<InputStream, T, ? extends IOException> statelessDecoder) {
     this.statelessDecoder = statelessDecoder;
@@ -33,7 +33,7 @@ public class SimpleDecoderFactory <T> implements DecoderFactory<T> {
   /**
    * Constructor
    * 
-   * @param statelessDecoder A function receiving a (buffered) input stream, reading & returning the next item read from it.
+   * @param statelessDecoder A function receiving a (buffered) input stream, reading and returning the next item read from it.
    * @param byteArrDecoder The byte array decoder to be returned by the newByteArrayDecoder() function.
    */
   public SimpleDecoderFactory(FailableFunction<InputStream, T, ? extends IOException> statelessDecoder, ByteArrayDecoder<T> byteArrDecoder) {

@@ -81,7 +81,7 @@ public class TxtCodecTest {
         ItemEncoder<String> encoder = TxtCodecFactory.IDENTITY.newEncoder(os)) {
       encoder.encode(s);
       encoder.close();
-      assertArrayEquals((s + "\n") .getBytes(StandardCharsets.UTF_8), os.toByteArray());
+      assertArrayEquals((s + System.lineSeparator()) .getBytes(StandardCharsets.UTF_8), os.toByteArray());
     }
   }
 

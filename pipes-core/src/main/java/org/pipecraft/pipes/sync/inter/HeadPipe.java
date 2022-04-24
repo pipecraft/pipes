@@ -6,7 +6,7 @@ import org.pipecraft.pipes.sync.Pipe;
 import org.pipecraft.pipes.exceptions.PipeException;
 
 /**
- * A pipe returning the first K items of its input pipe. If the source pipe has m<k items, the m items are returned.
+ * A pipe returning the first K items of its input pipe. If the source pipe has m &lt; K items, the m items are returned.
  * 
  * @param <T> The item data type
  *

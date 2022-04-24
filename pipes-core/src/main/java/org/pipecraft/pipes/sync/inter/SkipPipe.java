@@ -6,7 +6,7 @@ import org.pipecraft.pipes.sync.Pipe;
 import org.pipecraft.pipes.exceptions.PipeException;
 
 /**
- * A pipe skipping the first K items of its input pipe. If the source pipe has m<=k items, the output of this pipe is empty.
+ * A pipe skipping the first K items of its input pipe. If the source pipe has m&lt;=k items, the output of this pipe is empty.
  * 
  * @param <T> The item data type
  *

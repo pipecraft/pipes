@@ -24,8 +24,10 @@ public interface FailableSupplier<T, E extends Exception> {
    *
    * @param supplier The supplier to wrap
    * @return The failable supplier (which effectively never throws checked exceptions)
+   * @param <T> The type of the data being returned
+   * @param <E> The exception type
    */
   static <T, E extends Exception> FailableSupplier<T, E> fromSupplier(Supplier<T> supplier) {
-    return () -> supplier.get();
+    return supplier::get;
   }
 }

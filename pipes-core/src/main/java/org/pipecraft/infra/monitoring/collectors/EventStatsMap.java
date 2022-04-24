@@ -43,7 +43,7 @@ public abstract class EventStatsMap<E> {
   /**
    * Sets the count for a specific category.
    * @param category A stats category
-   * @param completed The number of events in the given category
+   * @param count The number of events in the given category
    */
   public void setCategoryCounts(E category, long count) {
     countsPerCat.put(category, count);

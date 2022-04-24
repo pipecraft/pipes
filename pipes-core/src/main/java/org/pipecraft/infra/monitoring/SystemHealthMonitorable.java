@@ -23,7 +23,7 @@ import net.minidev.json.JSONObject;
 /**
  * A monitorable covering different JVM and runtime aspects
  * 
- * TODO(Eyal): Consider implementing a generic JMXBean->JSON converter, so that any MXBean can be exposed
+ * TODO(Eyal): Consider implementing a generic JMXBean-to-JSON converter, so that any MXBean can be exposed
  * as a JsonMonitorable easily.
  * 
  * @author Eyal Schneider

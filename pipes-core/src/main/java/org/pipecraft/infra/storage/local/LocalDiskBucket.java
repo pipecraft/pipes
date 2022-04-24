@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import org.pipecraft.infra.io.FileUtils;
@@ -163,12 +164,11 @@ public class LocalDiskBucket extends Bucket<File> {
   public String getPath(File f) {
     try {
       String fullPath = f.getCanonicalPath();
-      String bucketPath = bucketFolder.getCanonicalPath() + "/";
+      String bucketPath = bucketFolder.getCanonicalPath() + File.separator;
       if (!fullPath.startsWith(bucketPath)) {
         throw new IllegalArgumentException("Given file (" + f.getAbsolutePath() + ") doesn't belong to the bucket " + getBucketName());
       }
-      
-      return fullPath.substring(bucketPath.length()) + (f.isDirectory() ? "/" : "");
+      return FilenameUtils.separatorsToUnix(fullPath.substring(bucketPath.length())) + (f.isDirectory() ? "/" : "");
     } catch (IOException e) {
       throw new RuntimeException("Unable to canonize paths", e);
     }
@@ -203,7 +203,7 @@ public class LocalDiskBucket extends Bucket<File> {
 
   @Override
   public URL generateResumableSignedUrlForUpload(String key, String contentType,
-      int expirationSeconds, Long maxContentLengthInBytes, boolean isPublic) throws IOException {
+      int expirationSeconds, Long maxContentLengthInBytes, boolean isPublic) {
     throw new UnsupportedOperationException();
   }
 

@@ -68,7 +68,7 @@
     <dependency>
       <groupId>com.github.luben</groupId>
       <artifactId>zstd-jni</artifactId>
-      <version>1.4.4-2</version>
+      <version>1.4.9-1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -179,6 +179,9 @@
             <goals>
               <goal>jar</goal>
             </goals>
+            <configuration>
+              <additionalOptions>-Xdoclint:none</additionalOptions>
+            </configuration>
           </execution>
         </executions>
       </plugin>

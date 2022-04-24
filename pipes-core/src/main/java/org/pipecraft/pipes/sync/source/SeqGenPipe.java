@@ -21,7 +21,7 @@ public class SeqGenPipe<T> implements Pipe<T> {
    * Constructor
    * 
    * @param generator The function generating the i-th item produced by this pipe. Input starts from 0. 
-   * Output of null means end of pipe. If g(i)=null, than for all j>i it's required that g(j)=null as well.
+   * Output of null means end of pipe. If g(i)=null, then for all j&gt;i it's required that g(j)=null as well.
    */
   public SeqGenPipe(Function<Long, T> generator) {
     this (generator, Long.MAX_VALUE);

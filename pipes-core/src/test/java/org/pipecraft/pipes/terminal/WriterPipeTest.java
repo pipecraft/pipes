@@ -21,6 +21,7 @@ public class WriterPipeTest {
       p.start();
     }
 
-    assertEquals("10\n20\n30\n", w.toString());
+
+    assertEquals("10"+ System.lineSeparator() + "20" + System.lineSeparator() + "30" + System.lineSeparator(), w.toString());
   }
 }

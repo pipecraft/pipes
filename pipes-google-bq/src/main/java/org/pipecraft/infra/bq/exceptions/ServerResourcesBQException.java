@@ -16,7 +16,7 @@ public class ServerResourcesBQException extends NonTransientBQException {
    * 
    * @param msg The error message
    * @param cause The original exception
-   * @param The failed query
+   * @param query The failed query
    */
   public ServerResourcesBQException(String msg, Throwable cause, BQQuery<?,?> query) {
     super(msg, cause, query);
@@ -26,7 +26,7 @@ public class ServerResourcesBQException extends NonTransientBQException {
    * Constructor
    * 
    * @param cause The original exception
-   * @param The failed query
+   * @param query The failed query
    */
   public ServerResourcesBQException(Throwable cause, BQQuery<?,?> query) {
     super(cause, query);

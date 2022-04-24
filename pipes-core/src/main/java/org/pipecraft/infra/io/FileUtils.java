@@ -96,6 +96,7 @@ public class FileUtils {
    *
    * @param file The file to read the lines from (UTF8)
    * @return The list of strings, each representing a line
+   * @throws IOException in case of read error
    */
   public static List<String> getLinesFromFile(File file) throws IOException {
     return getLinesFromFile(file, StandardCharsets.UTF_8, new FileReadOptions());
@@ -108,6 +109,7 @@ public class FileUtils {
    * @param charset The charset the text file is encoded with
    * @param options the file reading options
    * @return The set of strings, each representing a unique line value
+   * @throws IOException in case of read error
    */
   public static Set<String> getLinesFromFileAsSet(File file, Charset charset, FileReadOptions options) throws IOException {
     BufferedReader reader = getReader(file, charset, options);
@@ -119,6 +121,7 @@ public class FileUtils {
    *
    * @param file The file to read the lines from (UTF8)
    * @return The set of strings, each representing a unique line value
+   * @throws IOException in case of read error
    */
   public static Set<String> getLinesFromFileAsSet(File file) throws IOException {
     return getLinesFromFileAsSet(file, StandardCharsets.UTF_8, new FileReadOptions());
@@ -129,11 +132,12 @@ public class FileUtils {
    *
    * @param reader The reader to read from. No need to be a buffered reader. Closed at the end of this call, regardless of IO exceptions.
    * @return The list of strings, each representing a line
+   * @throws IOException in case of read error
    */
   public static List<String> getListFromReader(Reader reader) throws IOException {
     BufferedReader br = new BufferedReader(reader);
     try {
-      ArrayList<String> res = new ArrayList<String>();
+      ArrayList<String> res = new ArrayList<>();
       String line = br.readLine();
       while (line != null) {
         res.add(line);
@@ -150,6 +154,7 @@ public class FileUtils {
    *
    * @param reader The reader to read from. No need to be a buffered reader. Closed at the end of this call, regardless of IO exceptions.
    * @return The set of strings, each representing a line
+   * @throws IOException in case of read error
    */
   public static Set<String> getSetFromReader(Reader reader) throws IOException {
     try (BufferedReader br = new BufferedReader(reader)){
@@ -168,8 +173,8 @@ public class FileUtils {
    *
    * @param filename A filename (in classpath)
    * @return The json object as read from the given file
-   * @throws IOException
-   * @throws {@link ParseException}
+   * @throws IOException in case of read error
+   * @throws ParseException In case of an illegal json
    */
   public static JSONObject getJSONFromClasspath(String filename) throws IOException, ParseException {
     InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
@@ -182,8 +187,8 @@ public class FileUtils {
    *
    * @param filename A filename (in classpath)
    * @return The list of json objects, one per line in the file
-   * @throws IOException
-   * @throws {@link ParseException}
+   * @throws IOException in case of read error
+   * @throws ParseException In case of an illegal json
    */
   public static List<JSONObject> getJSONListFromClasspath(String filename) throws IOException,
       ParseException {
@@ -207,7 +212,7 @@ public class FileUtils {
    *
    * @param filename A filename (in classpath)
    * @return The string as read from the given file
-   * @throws IOException
+   * @throws IOException in case of read error
    */
   public static String getStringFromClasspath(String filename) throws IOException {
     try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename)) {
@@ -219,8 +224,8 @@ public class FileUtils {
    * @param is An input stream to read the json from. Expected to have a single valid json object.
    * The stream is closed by this method.
    * @return The json object as read from the given stream
-   * @throws IOException
-   * @throws {@link ParseException}
+   * @throws IOException in case of read error
+   * @throws ParseException In case of an illegal json
    */
   public static JSONObject getJSONFromInpuStream(InputStream is) throws IOException, ParseException {
     JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
@@ -232,8 +237,8 @@ public class FileUtils {
   /**
    * @param file A file to read as json. Expected to have one valid json object.
    * @return The json object as read from the given file
-   * @throws IOException
-   * @throws {@link ParseException}
+   * @throws IOException in case of read error
+   * @throws ParseException In case of an illegal json
    */
   public static JSONObject getJSONFromFile(File file) throws IOException, ParseException {
     InputStream is = new FileInputStream(file);
@@ -246,8 +251,8 @@ public class FileUtils {
    *
    * @param file The file to read from
    * @return The list of json objects, each one read from one line in the file
-   * @throws IOException
-   * @throws {@link ParseException}
+   * @throws IOException in case of read error
+   * @throws ParseException In case of an illegal json
    */
   public static List<JSONObject> getJSONListFromFile(File file) throws IOException, ParseException {
     JSONParser parser = new JSONParser(DEFAULT_PERMISSIVE_MODE);
@@ -266,7 +271,7 @@ public class FileUtils {
   /**
    * @param json The json object to write
    * @param file A file to write the json to. The file is being overridden.
-   * @throws IOException
+   * @throws IOException in case of write error
    */
   public static void writeJSONToFile(JSONObject json, File file) throws IOException {
     try (BufferedWriter w = getWriter(file)) {
@@ -277,9 +282,9 @@ public class FileUtils {
   /**
    * @param jsonList The list of json objects to write, one per line
    * @param file A file to write the json objects to
-   * @throws IOException
+   * @throws IOException in case of write error
    */
-  public static void writeJSONListToFile(List<JSONObject> jsonList, File file) throws IOException, ParseException {
+  public static void writeJSONListToFile(List<JSONObject> jsonList, File file) throws IOException {
     try (BufferedWriter w = getWriter(file)) {
       for (JSONObject json : jsonList) {
         w.write(json.toJSONString());
@@ -293,6 +298,7 @@ public class FileUtils {
    *
    * @param file The CSV file to read from
    * @return A list of lines, each composed of a list of parsed columns
+   * @throws IOException in case of read error
    */
   public static List<List<String>> readCSV(File file) throws IOException {
     return readCSV(file, new FileReadOptions());
@@ -304,6 +310,7 @@ public class FileUtils {
    * @param file The CSV file to read from
    * @param options (allows reading compressed CSVs for example)
    * @return A list of lines, each composed of a list of parsed columns
+   * @throws IOException in case of read error
    */
   public static List<List<String>> readCSV(File file, Charset charset, FileReadOptions options) throws IOException {
     return readCSV(getReader(file, charset, options));
@@ -314,6 +321,7 @@ public class FileUtils {
    *
    * @param csvReader The CSV file reader
    * @return A list of lines, each composed of a list of parsed columns
+   * @throws IOException in case of read error
    */
   public static List<List<String>> readCSV(Reader csvReader) throws IOException {
     CSVFormat csvFormat = CSVFormat.DEFAULT.withNullString("null");
@@ -340,6 +348,7 @@ public class FileUtils {
    * @param file The CSV file to read from
    * @param options (allows reading compressed CSVs for example)
    * @return A list of lines, each composed of a list of parsed columns
+   * @throws IOException in case of read error
    */
   public static List<List<String>> readCSV(File file, FileReadOptions options) throws IOException {
     return readCSV(file, StandardCharsets.UTF_8, options);
@@ -350,6 +359,7 @@ public class FileUtils {
    *
    * @param lines the lines to write. The iteration order defines the line write order.
    * @param f The file to write to
+   * @throws IOException in case of write error
    */
   public static void writeCSV(List<List<String>> lines, File f) throws IOException {
     writeCSV(lines, f, cells -> cells.toArray(new String[cells.size()]));
@@ -363,6 +373,7 @@ public class FileUtils {
    * @param toLineTransformer transformer of each object into csv columns
    * @param f The file to write to
    * @param options The file writing options
+   * @throws IOException in case of write error
    */
   public static <T> void writeCSV(Collection<T> lines, File f, Function<T, Object[]> toLineTransformer, FileWriteOptions options) throws IOException {
     writeCSV(lines.iterator(), f, toLineTransformer, options);
@@ -378,6 +389,7 @@ public class FileUtils {
    * @param headers the csv file headers. optional - if null/empty - ignored
    * @param <T> the entity type
    * @throws IOException on failure
+   * @throws IOException in case of write error
    */
   public static <T> void writeCSV(Iterator<T> iterator, File file, Function<T, Object[]> toLineTransformer, FileWriteOptions options, String... headers) throws IOException {
     CSVFormat csvFormat = CSVFormat.DEFAULT.withNullString("null");
@@ -402,6 +414,7 @@ public class FileUtils {
    *
    * @param lines the lines to write. The iteration order defines the line write order.
    * @param f The file to write to
+   * @throws IOException in case of write error
    */
   public static <T> void writeCSV(Collection<T> lines, File f, Function<T, Object[]> toLineTransformer) throws IOException {
     writeCSV(lines, f, toLineTransformer, new FileWriteOptions());
@@ -413,6 +426,7 @@ public class FileUtils {
    * @param lines the lines to write. The iteration order defines the line write order.
    * @param f The file to write to
    * @param options The file writing options
+   * @throws IOException in case of write error
    */
   public static void writeLines(Collection<String> lines, File f, FileWriteOptions options) throws IOException {
     try (BufferedWriter bw = getWriter(f, options)) {
@@ -428,6 +442,7 @@ public class FileUtils {
    *
    * @param lines the lines to write. The iteration order defines the line write order.
    * @param f The file to write to
+   * @throws IOException in case of write error
    */
   public static void writeLines(Collection<String> lines, File f) throws IOException {
     writeLines(lines, f, new FileWriteOptions());
@@ -438,6 +453,7 @@ public class FileUtils {
    *
    * @param folderPath - path (including the name) of the folder
    * @return The new created folder
+   * @throws IOException in case that the folder couldn't be created
    */
   public static File createFolder(String folderPath) throws IOException {
     File folder = new File(folderPath);
@@ -455,6 +471,7 @@ public class FileUtils {
    * @param parentFolder the parent folder that should contain the folder
    * @param folderPath path (including the name) of the folder
    * @return The new requested folder (existing or created), after verifying its existence
+   * @throws IOException in case that the folder couldn't be created
    */
   public static File createFolder(File parentFolder, String folderPath) throws IOException {
     File folder = new File(parentFolder, folderPath);
@@ -522,8 +539,8 @@ public class FileUtils {
   }
 
   /**
-   * <p>Same as {@link this#sort(File, FilenameFilter, File, File, int)}, but enables to supply a
-   * {@link FilenameFilter} to exclude files from the provided directory from being sorted.</p>
+   * Same as {@link this#sort(File, File, File, int)}, but enables to supply a
+   * {@link FilenameFilter} to exclude files from the provided directory from being sorted.
    *
    * @param srcDir The file/folder to sort. The file/s are assumed to be CSV, and lines are sorted
    * lexicographically. If a folder is used, all files inside it are sorted as into one output
@@ -544,6 +561,7 @@ public class FileUtils {
    * @param source The file to examine
    * @param options File reading options
    * @return The number of lines in the file
+   * @throws IOException In case of read error
    */
   public static int lineCount(File source, FileReadOptions options) throws IOException {
     try (BufferedReader br = getReader(source, options)) {
@@ -562,6 +580,7 @@ public class FileUtils {
    *
    * @param source The file to examine
    * @return The number of lines in the file
+   * @throws IOException In case of read error
    */
   public static int lineCount(File source) throws IOException {
     return lineCount(source, new FileReadOptions());
@@ -690,6 +709,7 @@ public class FileUtils {
    * @param file The input text file
    * @param lineCountToCopy The number of lines to copy from the input file. Less lines may be copied if the file line count is lower than this number.
    * @param outputFile The output file
+   * @throws IOException In case of read/write error
    */
   public static void saveFileHead(File file, int lineCountToCopy, File outputFile) throws IOException {
     try (
@@ -774,7 +794,7 @@ public class FileUtils {
    * @param folder The input folder
    * @param compression The compression to use. NONE is illegal.
    * @param parallelism The number of threads to use
-   * @throws IOException
+   * @throws IOException in case of IO error or if the thread is interrupted
    */
   public static void compressAll(File folder, Compression compression, int parallelism) throws IOException {
     compressAll(folder, compression, compression.getDefaultCompressionLevel(), parallelism);
@@ -877,7 +897,7 @@ public class FileUtils {
    * @param file1 File #1
    * @param file2 File #2
    * @return True if and only if the byte sequences of the two files are identical
-   * @throws IOException
+   * @throws IOException in case of read error
    */
   public static boolean areIdentical(File file1, File file2) throws IOException {
     byte[] buffer1 = new byte[8096];
@@ -907,6 +927,7 @@ public class FileUtils {
    * @param folder The folder where to create the temp file, or null for default temp folder.
    * @return A new temp file in the given folder. The file is set to be deleted at JVM shutdown, but it's recommended
    * to delete it explicitly when not used anymore.
+   * @throws IOException In case that the temporary file can't be created
    */
   public static File createTempFile(String prefix, String suffix, File folder) throws IOException {
     File f = File.createTempFile(prefix, suffix, folder);
@@ -918,9 +939,9 @@ public class FileUtils {
    * Creates a unique temp file in the system's default tmp folder. The file is deleted automatically when the JVM exits.
    *
    * @param prefix The name prefix of the temp file. Must be at least 3 char long. Must not include path separators.
-   * @param prefix The name suffix of the temp file (e.g. ".csv").
    * @return A new temp file in the system's temp folder. The file is set to be deleted at JVM shutdown, but it's recommended
    * to delete it explicitly when not used anymore.
+   * @throws IOException In case that the temporary file can't be created
    */
   public static File createTempFile(String prefix, String suffix) throws IOException {
     return createTempFile(prefix, suffix, null);
@@ -933,6 +954,7 @@ public class FileUtils {
    * @param suffix The name suffix of the temp file (e.g. ".csv").
    * @param folder The folder where to create the temp file
    * @return A new file in the given folder
+   * @throws IOException in case that the file can't be created in the given folder
    */
   public static File createUniqueFile(String prefix, String suffix, File folder) throws IOException {
     return File.createTempFile(prefix, suffix, folder);
@@ -942,8 +964,8 @@ public class FileUtils {
    * Creates a unique file in the system's default tmp folder. The file is not deleted automatically when the JVM exits.
    *
    * @param prefix The name prefix of the temp file. Must be at least 3 char long. Must not include path separators.
-   * @param prefix The name suffix of the temp file (e.g. ".csv").
    * @return A new file in the system's temp folder
+   * @throws IOException in case that the file can't be created in the given folder
    */
   public static File createUniqueFile(String prefix, String suffix) throws IOException {
     return File.createTempFile(prefix, suffix);
@@ -955,6 +977,7 @@ public class FileUtils {
    * @param prefix The name prefix for the temp folder
    * @param parentFolder The parent folder under which to create the temp folder
    * @return A new temp folder under the given parent folder. The folder is set to be deleted at JVM shutdown
+   * @throws IOException in case that the folder can't be created
    */
   public static File createTempFolder(String prefix, File parentFolder) throws IOException {
     File res = createUniqueFolder(prefix, parentFolder);
@@ -975,6 +998,7 @@ public class FileUtils {
    * @param prefix The name prefix for the folder
    * @param parentFolder The parent folder under which to create the folder
    * @return A new folder with unique name under the given parent folder. The folder is not set to be deleted at JVM shutdown
+   * @throws IOException in case that the folder can't be created
    */
   public static File createUniqueFolder(String prefix, File parentFolder) throws IOException {
     Path path = Files.createTempDirectory(parentFolder.toPath(), prefix);
@@ -988,6 +1012,7 @@ public class FileUtils {
    * @param prefix The name prefix for the temp folder
    * @return A new temp folder under the system's tmp folder. The folder is set to be deleted at JVM shutdown, provided that
    * it's empty or all files in it are also created as temporary.
+   * @throws IOException In case of a write error
    */
   public static File createTempFolder(String prefix) throws IOException {
     File res = createUniqueFolder(prefix);
@@ -1000,6 +1025,7 @@ public class FileUtils {
    *
    * @param prefix The name prefix for the folder
    * @return A new folder under the system's tmp folder. The folder is not set to be deleted at JVM shutdown
+   * @throws IOException In case of a write error
    */
   public static File createUniqueFolder(String prefix) throws IOException {
     Path path = Files.createTempDirectory(prefix);
@@ -1013,6 +1039,7 @@ public class FileUtils {
    * @param os The stream to wrap
    * @param options The write options
    * @return The resulting output stream (buffered)
+   * @throws IOException In case of a read/write error
    */
   public static BufferedOutputStream getOutputStream(OutputStream os, FileWriteOptions options) throws IOException {
     os = getCompressionOutputStream(os, options.getCompression(), options.getCompressionLevel());
@@ -1025,6 +1052,7 @@ public class FileUtils {
    * @param f The file to write to
    * @param options The write options
    * @return The resulting output stream (buffered)
+   * @throws IOException In case of a read/write error
    */
   public static BufferedOutputStream getOutputStream(File f, FileWriteOptions options) throws IOException {
     if (options.isTemp()) {
@@ -1040,6 +1068,7 @@ public class FileUtils {
    * @param is The input stream to wrap
    * @param options The read options
    * @return The resulting input stream (Buffered)
+   * @throws IOException In case of a read/write error
    */
   public static BufferedInputStream getInputStream(InputStream is, FileReadOptions options) throws IOException {
     is = getCompressionInputStream(is, options.getCompression());
@@ -1052,6 +1081,7 @@ public class FileUtils {
    * @param f The file to read from
    * @param options The read options
    * @return The resulting input stream (Buffered)
+   * @throws IOException In case of a read/write error
    */
   public static BufferedInputStream getInputStream(File f, FileReadOptions options) throws IOException {
     InputStream is = new FileInputStream(f);
@@ -1066,6 +1096,7 @@ public class FileUtils {
    * @param charset The character encoding to use
    * @param options The write options
    * @return The new buffered writer. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedWriter getWriter(OutputStream os, Charset charset, FileWriteOptions options) throws IOException {
     os = getCompressionOutputStream(os, options.getCompression(), options.getCompressionLevel());
@@ -1081,6 +1112,7 @@ public class FileUtils {
    * @param charset The character encoding to use
    * @param options The file writing options
    * @return The new buffered writer. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedWriter getWriter(File f, Charset charset, FileWriteOptions options) throws IOException {
     if (options.isTemp()) {
@@ -1098,6 +1130,7 @@ public class FileUtils {
    * @param f The file
    * @param options The file writing options
    * @return The new buffered writer. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedWriter getWriter(File f, FileWriteOptions options) throws IOException {
     return getWriter(f, StandardCharsets.UTF_8, options);
@@ -1110,6 +1143,7 @@ public class FileUtils {
    * @param f The file
    * @param charset The character encoding to use
    * @return The new buffered writer. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedWriter getWriter(File f, Charset charset) throws IOException {
     return getWriter(f, charset, new FileWriteOptions());
@@ -1121,6 +1155,7 @@ public class FileUtils {
    *
    * @param f The file
    * @return The new buffered writer. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedWriter getWriter(File f) throws IOException {
     return getWriter(f, StandardCharsets.UTF_8, new FileWriteOptions());
@@ -1130,6 +1165,7 @@ public class FileUtils {
    * @param is The input stream to wrap
    * @param compression Compression of the data supplied by the given input stream
    * @return The decompressing input stream
+   * @throws IOException In case of a read/write error
    */
   public static InputStream getCompressionInputStream(InputStream is, Compression compression) throws IOException {
     switch (compression) {
@@ -1149,6 +1185,7 @@ public class FileUtils {
    * @param os The output stream to wrap
    * @param compression The required compression to apply
    * @return The compressing output stream
+   * @throws IOException In case of a read/write error
    */
   public static OutputStream getCompressionOutputStream(OutputStream os, Compression compression) throws IOException {
     return getCompressionOutputStream(os, compression, compression.getDefaultCompressionLevel());
@@ -1159,6 +1196,7 @@ public class FileUtils {
    * @param compression The required compression to apply
    * @param compressionLevel The compression level to use. Specific to the chosen compression scheme.
    * @return The compressing output stream
+   * @throws IOException In case of a read/write error
    */
   public static OutputStream getCompressionOutputStream(OutputStream os, Compression compression, int compressionLevel) throws IOException {
     switch (compression) {
@@ -1182,6 +1220,7 @@ public class FileUtils {
    * @param charset The character encoding to use
    * @param options The read options
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedReader getReader(InputStream is, Charset charset, FileReadOptions options) throws IOException {
     is = getCompressionInputStream(is, options.getCompression());
@@ -1196,6 +1235,7 @@ public class FileUtils {
    *
    * @param is The input stream
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedReader getReader(InputStream is) throws IOException {
     return getReader(is, StandardCharsets.UTF_8, new FileReadOptions());
@@ -1209,6 +1249,7 @@ public class FileUtils {
    * @param charset The character encoding to use
    * @param options The file read options
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedReader getReader(File f, Charset charset, FileReadOptions options) throws IOException {
     InputStream is = new FileInputStream(f);
@@ -1222,6 +1263,7 @@ public class FileUtils {
    * @param f The file
    * @param options The file read options
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedReader getReader(File f, FileReadOptions options) throws IOException {
     return getReader(f, StandardCharsets.UTF_8, options);
@@ -1234,6 +1276,7 @@ public class FileUtils {
    * @param f The file
    * @param charset The character encoding to use
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedReader getReader(File f, Charset charset) throws IOException {
     return getReader(f, charset, new FileReadOptions());
@@ -1245,6 +1288,7 @@ public class FileUtils {
    *
    * @param f The file
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException In case of a read/write error
    */
   public static BufferedReader getReader(File f) throws IOException {
     return getReader(f, StandardCharsets.UTF_8, new FileReadOptions());
@@ -1284,6 +1328,7 @@ public class FileUtils {
    * @param path The path in classpath
    * @param options The file read options
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException in case of read error
    */
   public static BufferedReader getReaderFromClasspath(String path, FileReadOptions options) throws IOException {
     return getReaderFromClasspath(path, StandardCharsets.UTF_8, options);
@@ -1296,6 +1341,7 @@ public class FileUtils {
    * @param path The path in classpath
    * @param charset The character encoding to use
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException in case of read error
    */
   public static BufferedReader getReaderFromClasspath(String path, Charset charset) throws IOException {
     return getReaderFromClasspath(path, charset, new FileReadOptions());
@@ -1307,6 +1353,7 @@ public class FileUtils {
    *
    * @param path The path in classpath
    * @return The new buffered reader. The caller should make sure to close it.
+   * @throws IOException in case of read error
    */
   public static BufferedReader getReaderFromClasspath(String path) throws IOException {
     return getReaderFromClasspath(path, StandardCharsets.UTF_8, new FileReadOptions());

@@ -16,7 +16,6 @@ import org.pipecraft.pipes.exceptions.PipeException;
  * 
  * @param <T> The target item data type
  *
- * private volatile Pipe<T> finalOutputPipe;
  */
 public class TopKPipe<T> implements Pipe<T> {
   private final Pipe<T> input;
@@ -29,7 +28,7 @@ public class TopKPipe<T> implements Pipe<T> {
    * Constructor
    * 
    * @param input The input pipe
-   * @param k The required number of top items to emit. If the input pipe has m<k items, then only m items will be returned.
+   * @param k The required number of top items to emit. If the input pipe has m&lt;k items, then only m items will be returned.
    * @param comparator The comparator defining an order on the input items, based on which the top k items should be returned
    */
   public TopKPipe(Pipe<T> input, int k, Comparator<? super T> comparator) {

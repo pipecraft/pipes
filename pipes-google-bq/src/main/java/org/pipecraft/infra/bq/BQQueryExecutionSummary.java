@@ -29,7 +29,7 @@ public class BQQueryExecutionSummary {
   /**
    * Constructor
    * 
-   * @param startTime The query start time, as millis since epoch
+   * @param startTimeMs The query start time, as millis since epoch
    * @param jobId The query's job id
    * @param bytes Total number of bytes processed
    * @param isCacheHit Indicates whether BQ cache has been used

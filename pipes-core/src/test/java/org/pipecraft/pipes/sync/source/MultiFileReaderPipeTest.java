@@ -6,10 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,7 +64,7 @@ public class MultiFileReaderPipeTest {
       FileUtils.writeLines(Arrays.asList("2"), new File(dataFolder, "b.csv"));
       FileUtils.writeLines(Arrays.asList("4", "3", "6"), new File(dataFolder, "c.csv"));
       FileUtils.writeLines(Arrays.asList("9", "10"), new File(dataFolder, "d.csv"));
-      FileUtils.writeLines(Arrays.asList("7", "8"), new File(dataFolder2, "d.csv")); // Duplicate file name to check file name deduper
+      FileUtils.writeLines(Arrays.asList("7", "8"), new File(dataFolder2, "d.csv")); // Duplicate file name on different folders
   
       List<String> readItems = new ArrayList<>();
       for (int shard = 0; shard < shardCount; shard++) {
@@ -93,7 +90,7 @@ public class MultiFileReaderPipeTest {
   public void testFileFilter() throws Exception {
     File tmpStorageFolder = FileUtils.createTempFolder("multiReaderTest");
     try {
-      File dataFolder = new File(tmpStorageFolder, "data/latest");
+      File dataFolder = new File(tmpStorageFolder, "data/latest1");
       File dataFolder2 = new File(tmpStorageFolder, "data/latest2");
       dataFolder.mkdirs();
       dataFolder2.mkdirs();
@@ -101,13 +98,14 @@ public class MultiFileReaderPipeTest {
       FileUtils.writeLines(Arrays.asList("2"), new File(dataFolder, "b.csv"));
       FileUtils.writeLines(Arrays.asList("4", "3", "6"), new File(dataFolder, "c.csv"));
       FileUtils.writeLines(Arrays.asList("9", "10"), new File(dataFolder, "d.csv"));
-      FileUtils.writeLines(Arrays.asList("7", "8"), new File(dataFolder2, "d.csv")); // Duplicate file name to check file name deduper
+      FileUtils.writeLines(Arrays.asList("7", "8"), new File(dataFolder2, "d.csv")); // Duplicate file name on different folders
   
       try (
           Pipe<String> p = new MultiFileReaderPipe<>(
               LocalMultiFileReaderConfig.builder(new TestPipeSupplier())
               .paths(dataFolder, dataFolder2)
               .andFilter(f -> f.getAbsolutePath().endsWith("d.csv"))
+              .fileOrder(Comparator.comparing(File::getAbsolutePath))
               .build());
           CollectionWriterPipe<String> w = new CollectionWriterPipe<>(p)) {
         w.start();
