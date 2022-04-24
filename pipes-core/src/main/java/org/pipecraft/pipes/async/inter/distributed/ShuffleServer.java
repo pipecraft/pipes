@@ -7,20 +7,12 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.netty.channel.*;
 import org.pipecraft.pipes.exceptions.PipeException;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.WriteBufferWaterMark;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.compression.Lz4FrameDecoder;
@@ -39,10 +31,10 @@ class ShuffleServer implements Closeable {
   private static final AttributeKey<ConnectionCounter> BYTE_SENT = AttributeKey.valueOf("byte_sent");
   private final int port;
   private final ChannelInboundHandlerAdapter channelInboundHandler;
-  private final EpollEventLoopGroup workerGroup;
+  private final EventLoopGroup workerGroup;
   private final CountDownLatch doneLatch;
   private final CheckedConsumer<byte[]> handler;
-  private EpollEventLoopGroup bossGroup;
+  private EventLoopGroup bossGroup;
 
   @FunctionalInterface
   public interface CheckedConsumer<T> {
@@ -102,16 +94,16 @@ class ShuffleServer implements Closeable {
   }
 
   /**
-   * Constructor.
+   * Constructor
    *
    * @param port                  The port number the server will bind to.
    * @param channelInboundHandler Netty Inbound adapter to handle the incoming message.
-   * @param workerGroup           Epoll event group for netty workers.
+   * @param workerGroup           The event loop group impl for netty workers.
    *                              The class doesn't take ownership and will not shutdown this group.
    * @param handler               A callback to handle incoming messages, in their raw representation
    */
   public ShuffleServer(int port, CountDownLatch doneLatch, ChannelInboundHandlerAdapter channelInboundHandler,
-                       EpollEventLoopGroup workerGroup, CheckedConsumer<byte[]> handler) {
+                       EventLoopGroup workerGroup, CheckedConsumer<byte[]> handler) {
     this.port = port;
     this.channelInboundHandler = channelInboundHandler;
     this.workerGroup = workerGroup;
@@ -120,10 +112,10 @@ class ShuffleServer implements Closeable {
   }
 
   public void start() throws InterruptedException {
-    bossGroup = new EpollEventLoopGroup(PROCESSORS);
+    bossGroup = NettyUtils.newEventLoopGroup(PROCESSORS);
 
     ServerBootstrap b = new ServerBootstrap();
-    b.group(bossGroup, workerGroup).channel(EpollServerSocketChannel.class)
+    b.group(bossGroup, workerGroup).channel(NettyUtils.getServerSocketChanneClass())
             .handler(new LoggingHandler(LogLevel.INFO))
             .childOption(ChannelOption.TCP_NODELAY, true)
             .childOption(ChannelOption.SO_REUSEADDR, true)
@@ -149,7 +141,9 @@ class ShuffleServer implements Closeable {
    * Waiting uninterruptibly until the boss shutdown.
    */
   public void close() {
-    if (bossGroup.isShuttingDown()) return;
+    if (bossGroup.isShuttingDown()) {
+      return;
+    }
     bossGroup.shutdownGracefully(2, 10, TimeUnit.SECONDS).syncUninterruptibly();
   }
 }

@@ -6,7 +6,6 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
-import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import io.netty.handler.flush.FlushConsolidationHandler;
@@ -93,7 +92,7 @@ class ShuffleClient<T> {
     this.encoder = encoder;
 
     this.bootstrap = new Bootstrap();
-    this.bootstrap.group(group).channel(EpollSocketChannel.class)
+    this.bootstrap.group(group).channel(NettyUtils.getSocketChanneClass())
             .option(ChannelOption.TCP_NODELAY, true)
             .option(ChannelOption.SO_KEEPALIVE, true)
             .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)

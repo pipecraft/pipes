@@ -1,5 +1,6 @@
 package org.pipecraft.pipes.async.inter.distributed;
 
+import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +17,6 @@ import org.pipecraft.pipes.exceptions.IOPipeException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.epoll.EpollEventLoopGroup;
 
 /**
  * An async pipe that takes input and shuffle it across multiple workers.
@@ -31,11 +31,11 @@ public class DistributedShufflerPipe<T> extends AsyncPipe<T> {
   private final DistributedShufflerConfig<T> config;
   private final Thread watcher;
   private final CountDownLatch doneLatch;
-  private EpollEventLoopGroup group;
+  private EventLoopGroup group;
   private ShuffleServer shuffleServer;
 
   /**
-   * Another Constructor????? YES!
+   * Constructor
    *
    * @param input  The input pipe supplying items which will be shuffled between the workers.
    * @param config The config object specifying the shuffler settings
@@ -57,7 +57,7 @@ public class DistributedShufflerPipe<T> extends AsyncPipe<T> {
   
   @Override
   public void start() throws PipeException, InterruptedException {
-    group = new EpollEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
+    group = NettyUtils.newEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
     shuffleServer = new ShuffleServer(config.getPort(), doneLatch, new ServerHandler(), group, bytes -> notifyNext(config.getCodec().decode(bytes)));
     shuffleServer.start();
     watcher.start();
