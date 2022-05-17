@@ -6,7 +6,7 @@
 
   <groupId>org.pipecraft.pipes</groupId>
   <artifactId>pipes-google-bq</artifactId>
-  <version>0.92-SNAPSHOT</version>
+  <version>0.92</version>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>A Google Big Query extension for pipes</description>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>org.pipecraft.pipes</groupId>
       <artifactId>pipes-core</artifactId>
-      <version>0.92-SNAPSHOT</version>
+      <version>0.92</version>
     </dependency>
 
     <dependency>
