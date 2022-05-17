@@ -65,6 +65,10 @@ The configuration class accepts the generic Bucket and storage classes, meaning 
 
 ---
 
+**MapWriterPipe/AsyncMapWriterPipe** - Adds items to a given Map object. In the case of async, the caller is responsible for passing a thread safe map.
+
+---
+
 **AsyncEnqueuingSharderPipe** - A terminal pipe that receives an async pipe as input, and shards the contents of the input pipe into multiple queues according to some sharding criteria based on item values. The queues are supplied at construction time, and any implementation of BlockingQueue is accepted. Pay attention to the caveats at the class documentation.
 
 ---
