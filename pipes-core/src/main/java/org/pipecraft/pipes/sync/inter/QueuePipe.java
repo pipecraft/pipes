@@ -15,7 +15,7 @@ import org.pipecraft.pipes.utils.QueueItem;
  * An intermediate pipe that actively pulls items from the input pipe and stores in a queue for the downstream pipe to fetch.
  * The threading model is a little different from other synchronous pipes: all upstream pipes are handled by an internal thread (the "produced thread" feeding the queue),
  * while all actions on this pipe are handled by the caller's thread. Therefore, positioning a QueuePipe in a flow will break the flow into producer part and consumer part,
- * each of them handled by a different threas.
+ * each of them handled by a different thread.
  *
  * @param <T> The item data type
  *
