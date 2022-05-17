@@ -2,6 +2,7 @@ package org.pipecraft.pipes.serialization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.pipecraft.infra.io.FileUtils;
 import org.pipecraft.pipes.exceptions.ValidationPipeException;
@@ -36,6 +37,17 @@ public class CSVCodecTest {
       r = decoder.decode();
       assertEquals(new TestTuple(null, 4), r); // Empty columns are parsed as null
       assertNull(decoder.decode());
+    }
+  }
+
+  @Test
+  public void testReadError() throws Exception {
+    DecoderFactory<TestTuple> factory = CSVDecoder.getFactory(TestTuple::fromCSVColumns); // Verifying that incorrect number of columns as detected by the item detextualizer is propagated properly.
+    String input = " 4 ";
+    byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
+    ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+    try (ItemDecoder<TestTuple> decoder = factory.newDecoder(is)) {
+      assertThrows(ValidationPipeException.class, decoder::decode);
     }
   }
 
@@ -179,6 +191,9 @@ public class CSVCodecTest {
     }
 
     public static TestTuple fromCSVColumns(String[] columns) throws ValidationPipeException {
+      if (columns.length != 2) {
+        throw new ValidationPipeException("Expected two columns");
+      }
       try {
         return new TestTuple(columns[0], Integer.parseInt(columns[1].trim()));
       } catch (NumberFormatException e) {
