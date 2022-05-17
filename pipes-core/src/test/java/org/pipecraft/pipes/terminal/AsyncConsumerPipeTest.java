@@ -43,7 +43,7 @@ public class AsyncConsumerPipeTest {
     Set<Integer> itemsReported = Collections.synchronizedSet(new HashSet<>());
     AtomicInteger terminationActionCount = new AtomicInteger();
     try (
-        AsyncPipe<Integer> prod = new AsyncSeqGenPipe<>(100, i -> i.intValue(), 2);
+        AsyncPipe<Integer> prod = new AsyncSeqGenPipe<>(100, Long::intValue, 2);
         TerminalPipe consumer = new AsyncConsumerPipe<>(prod, itemsReported::add, terminationActionCount::incrementAndGet)) {
       consumer.start();
     }
@@ -53,13 +53,13 @@ public class AsyncConsumerPipeTest {
   }
 
   @Test
-  public void testItemActionError() throws Exception {
+  public void testItemActionError() {
     Set<Integer> itemsReported = Collections.synchronizedSet(new HashSet<>());
     AtomicInteger terminationActionCount = new AtomicInteger();
     
     assertThrows(ValidationPipeException.class, () -> {
       try (
-          AsyncPipe<Integer> prod = new AsyncSeqGenPipe<>(1000, i -> i.intValue(), 2);
+          AsyncPipe<Integer> prod = new AsyncSeqGenPipe<>(1000, Long::intValue, 2);
           TerminalPipe consumer = new AsyncConsumerPipe<>(prod, item -> {
             itemsReported.add(item);
             if (itemsReported.size() > 500) {
