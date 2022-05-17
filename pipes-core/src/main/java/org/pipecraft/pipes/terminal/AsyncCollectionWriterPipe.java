@@ -23,7 +23,7 @@ public class AsyncCollectionWriterPipe<T> extends TerminalPipe {
   private final AsyncPipe<T> input;
   private final Collection<T> outputCollection;
   private final CountDownLatch terminationLatch = new CountDownLatch(1);
-  private PipeException exception;
+  private volatile PipeException exception;
   /**
    * Constructor
    * 
@@ -34,20 +34,20 @@ public class AsyncCollectionWriterPipe<T> extends TerminalPipe {
     this.input = input;
     this.outputCollection = outputCollection;
     
-    input.setListener(new AsyncPipeListener<T>() {
+    input.setListener(new AsyncPipeListener<>() {
 
       @Override
-      public void next(T item) throws PipeException, InterruptedException {
+      public void next(T item) {
         outputCollection.add(item);
       }
 
       @Override
-      public void done() throws InterruptedException {
+      public void done() {
         terminationLatch.countDown();
       }
 
       @Override
-      public void error(PipeException e) throws InterruptedException {
+      public void error(PipeException e) {
         exception = e;
         terminationLatch.countDown();
       }
