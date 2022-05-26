@@ -19,10 +19,10 @@ public class ImmediateFutureTest {
   @Test
   public void testValue() {
     CheckedFuture<?, IOException> f = ImmediateFuture.ofError(new IOException("Test"));
-    assertThrows(IOException.class, () -> f.checkedGet());
+    assertThrows(IOException.class, f::checkedGet);
     
     CheckedFuture<?, RuntimeException> f2 = ImmediateFuture.ofError(new RuntimeException("Test"));
-    assertThrows(RuntimeException.class, () -> f2.checkedGet());
+    assertThrows(RuntimeException.class, f2::checkedGet);
   }
 
   @Test

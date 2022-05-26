@@ -62,7 +62,7 @@ public class SlidingWindowQuantileEstimatorTest {
   }
 
   @Test
-  public void testJournalEviction() throws IOException {
+  public void testJournalEviction() {
     double[] valuesConcat;
 
     int capacity = 2;

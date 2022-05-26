@@ -13,7 +13,6 @@ import org.pipecraft.pipes.terminal.CollectionWriterPipe;
 import org.pipecraft.pipes.terminal.TerminalPipe;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -46,7 +45,7 @@ public class GrouperPipeTest {
       TerminalPipe tp = new CollectionWriterPipe<>(listP, out);
         ) {
       tp.start();
-      Collections.sort(out, Comparator.comparing(l -> l.get(0).length()));
+      out.sort(Comparator.comparing(l -> l.get(0).length()));
       assertEquals(List.of(
           List.of("a"),
           List.of("be"),
@@ -67,7 +66,7 @@ public class GrouperPipeTest {
         TerminalPipe tp = new CollectionWriterPipe<>(listP, out);
     ) {
       tp.start();
-      Collections.sort(out, Comparator.comparing(l -> l.get(0).length()));
+      out.sort(Comparator.comparing(l -> l.get(0).length()));
       assertEquals(List.of(
           List.of("an", "be", "or", "to")
       ), out);

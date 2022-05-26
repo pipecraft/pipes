@@ -178,7 +178,6 @@ public class HashJoinPipeTest {
           expectedRight.put(1, Lists.newArrayList(dude));
           assertEquals(new JoinRecord<>(3, Lists.newArrayList(3), expectedRight), next);
         } else if (next.getKey() == 5) {
-          expectedRight.clear();
           expectedRight.put(0, Lists.newArrayList(maude));
           assertEquals(new JoinRecord<>(5, Lists.newArrayList(5), expectedRight), next);
         }

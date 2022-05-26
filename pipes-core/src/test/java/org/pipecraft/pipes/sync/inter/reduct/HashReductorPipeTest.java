@@ -81,7 +81,7 @@ public class HashReductorPipeTest {
         TerminalPipe tp = new CollectionWriterPipe<>(sp, res);
     ) {
       tp.start();
-      assertEquals(Arrays.asList("what_2"), res);
+      assertEquals(List.of("what_2"), res);
     }
   }
 

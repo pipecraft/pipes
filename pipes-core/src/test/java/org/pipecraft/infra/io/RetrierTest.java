@@ -26,7 +26,7 @@ public class RetrierTest {
   @Test
   public void testSuccessFirstAttempt() throws RuntimeException, InterruptedException {
     MutableInt attemptCounter = new MutableInt();
-    Retrier.runWithDefaults(()->attemptCounter.increment());
+    Retrier.runWithDefaults(attemptCounter::increment);
     assertEquals(1, attemptCounter.intValue());
   }
 
@@ -65,14 +65,14 @@ public class RetrierTest {
   }
 
   @Test
-  public void testTerminalErrors() throws Exception {
+  public void testTerminalErrors() {
     TestRunnableFailable r = new TestRunnableFailable(FileNotFoundException.class);
     assertThrows(FileNotFoundException.class, () -> Retrier.run(r, Collections.singleton(FileNotFoundException.class), 10, 2.0, 4));
     assertEquals(1, r.getRunTimes().size());
   }
 
   @Test
-  public void testInterruptedException() throws Exception {
+  public void testInterruptedException() {
     TestRunnableFailableInterrupted r = new TestRunnableFailableInterrupted();
     assertThrows(InterruptedException.class, () -> Retrier.run(r, 10, 2.0, 4));
     assertEquals(1, r.getRunTimes().size());

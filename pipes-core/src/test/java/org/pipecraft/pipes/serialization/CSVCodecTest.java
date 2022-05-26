@@ -63,7 +63,7 @@ public class CSVCodecTest {
       assertEquals(new TestTuple("", 1), r);
       r = decoder.decode();
       assertEquals(new TestTuple(null, 2), r);
-      r = decoder.decode();
+      decoder.decode();
       assertNull(decoder.decode());
     }
   }
@@ -136,8 +136,7 @@ public class CSVCodecTest {
     try {
       try (
           FileOutputStream os = new FileOutputStream(f);
-          CSVEncoder<TestTuple> encoder = new CSVEncoder<>(os, TestTuple::toCSVColumns);
-      ) {
+          CSVEncoder<TestTuple> encoder = new CSVEncoder<>(os, TestTuple::toCSVColumns)) {
         encoder.encode(new TestTuple("a ", 1));
         encoder.encode(new TestTuple(" b", 2));
         encoder.encode(new TestTuple("c,d", 3));
@@ -147,8 +146,7 @@ public class CSVCodecTest {
 
       try (
           FileInputStream is = new FileInputStream(f);
-          CSVDecoder<TestTuple> decoder = new CSVDecoder<>(is, TestTuple::fromCSVColumns);
-      ) {
+          CSVDecoder<TestTuple> decoder = new CSVDecoder<>(is, TestTuple::fromCSVColumns)) {
         TestTuple r = decoder.decode();
         assertEquals(new TestTuple("a ", 1), r);
         r = decoder.decode();

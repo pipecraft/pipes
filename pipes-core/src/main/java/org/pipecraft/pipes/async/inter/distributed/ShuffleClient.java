@@ -82,7 +82,7 @@ class ShuffleClient<T> {
    *
    * @param host    Host ip/DNS of the server.
    * @param port    Port of the server.
-   * @param encoder
+   * @param encoder The encoder to use for encoding items prior to sending them to the designated worker
    * @param group   Netty event loop group the client should run in.
    */
   public ShuffleClient(String host, int port, ByteArrayEncoder<T> encoder,

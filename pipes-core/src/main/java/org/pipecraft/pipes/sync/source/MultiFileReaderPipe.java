@@ -47,7 +47,7 @@ public class MultiFileReaderPipe<T> extends CompoundPipe<T> {
       // Sort
       if (config.getFileOrder() != null) {
         List<File> sortedFiles = new ArrayList<>(filesToRead);
-        Collections.sort(sortedFiles, config.getFileOrder());
+        sortedFiles.sort(config.getFileOrder());
         filesToRead = sortedFiles;
       }
       

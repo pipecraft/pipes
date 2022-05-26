@@ -30,9 +30,8 @@ public class AsyncFlexibleMapPipeTest {
     AtomicInteger itemsTraversed = new AtomicInteger();
     try(
         AsyncPipe<Integer> prod = new AsyncEmptyPipe<>();
-        AsyncPipe<Integer> fmp = new AsyncFlexibleMapPipe<Integer, Integer>(prod, v -> new CollectionReaderPipe<>(1, 2, 3));
-        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, v -> itemsTraversed.incrementAndGet());
-        ) {
+        AsyncPipe<Integer> fmp = new AsyncFlexibleMapPipe<>(prod, v -> new CollectionReaderPipe<>(1, 2, 3));
+        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, v -> itemsTraversed.incrementAndGet())) {
       tp.start();
     }
     assertEquals(0, itemsTraversed.get());
@@ -49,7 +48,7 @@ public class AsyncFlexibleMapPipeTest {
           } 
           return new CollectionReaderPipe<>(v);
         });
-        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, v -> itemsTraversed.add(v))) {
+        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, itemsTraversed::add)) {
       tp.start();
     }
     assertEquals(Sets.newHashSet(1, 3, 5), itemsTraversed);
@@ -60,10 +59,8 @@ public class AsyncFlexibleMapPipeTest {
     Set<Integer> itemsTraversed = Collections.synchronizedSet(new HashSet<>());
     try(
         AsyncPipe<Integer> prod = new AsyncSeqGenPipe<>(5, v -> (int)(v + 1), 2);
-        AsyncPipe<Integer> fmp = new AsyncFlexibleMapPipe<>(prod, v -> {
-          return new CollectionReaderPipe<>(2 * v);
-        });
-        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, v -> itemsTraversed.add(v))) {
+        AsyncPipe<Integer> fmp = new AsyncFlexibleMapPipe<>(prod, v -> new CollectionReaderPipe<>(2 * v));
+        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, itemsTraversed::add)) {
       tp.start();
     }
     assertEquals(Sets.newHashSet(2, 4, 6, 8, 10), itemsTraversed);
@@ -74,10 +71,8 @@ public class AsyncFlexibleMapPipeTest {
     Set<Integer> itemsTraversed = Collections.synchronizedSet(new HashSet<>());
     try(
         AsyncPipe<Integer> prod = new AsyncSeqGenPipe<>(5, v -> (int)(v + 1), 2);
-        AsyncPipe<Integer> fmp = new AsyncFlexibleMapPipe<>(prod, v -> {
-          return new CollectionReaderPipe<>(2 * v, 2 * v - 1);
-        });
-        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, v -> itemsTraversed.add(v))) {
+        AsyncPipe<Integer> fmp = new AsyncFlexibleMapPipe<>(prod, v -> new CollectionReaderPipe<>(2 * v, 2 * v - 1));
+        TerminalPipe tp = new AsyncConsumerPipe<>(fmp, itemsTraversed::add)) {
       tp.start();
     }
     assertEquals(Sets.newHashSet(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), itemsTraversed);

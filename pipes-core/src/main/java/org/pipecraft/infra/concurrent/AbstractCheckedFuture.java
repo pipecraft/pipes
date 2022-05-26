@@ -17,8 +17,8 @@ import java.util.concurrent.TimeoutException;
  * 
  * This class implements the CheckedFuture interface, which is a replacement for Google's deprecated CheckedFuture.
  * 
- * @param V The future's output value type
- * @param E The type of the checked exception thrown by the checkedGet() methods
+ * @param <V> The future's output value type
+ * @param <E> The type of the checked exception thrown by the checkedGet() methods
  * 
  * @author Eyal Schneider
  * 

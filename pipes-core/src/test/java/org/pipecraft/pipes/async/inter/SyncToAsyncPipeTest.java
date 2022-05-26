@@ -35,7 +35,7 @@ public class SyncToAsyncPipeTest {
   @Test
   public void testSingleInputPipe() throws Exception {
     List<Long> producedItems = Collections.synchronizedList(new ArrayList<>());
-    try (Pipe<Long> p0 = new SeqGenPipe<Long>(Functions.identity(), 10);
+    try (Pipe<Long> p0 = new SeqGenPipe<>(Functions.identity(), 10);
          AsyncPipe<Long> p1 = SyncToAsyncPipe.fromPipe(p0);
          TerminalPipe tp = new AsyncConsumerPipe<>(p1, producedItems::add)) {
       tp.start();
@@ -46,10 +46,10 @@ public class SyncToAsyncPipeTest {
 
   @Test
   @Timeout(40)
-  public void testStoppingByClose() throws Exception {
+  public void testStoppingByClose() {
     assertTimeout(Duration.ofSeconds(30), () -> {
-      try (Pipe<Long> p01 = new SeqGenPipe<Long>(Functions.identity()); // Infinite stream
-           Pipe<Long> p02 = new SeqGenPipe<Long>(Functions.identity()); // Infinite stream
+      try (Pipe<Long> p01 = new SeqGenPipe<>(Functions.identity()); // Infinite stream
+           Pipe<Long> p02 = new SeqGenPipe<>(Functions.identity()); // Infinite stream
            AsyncPipe<Long> p1 = SyncToAsyncPipe.fromPipes(Lists.newArrayList(p01, p02), 2);
            TerminalPipe tp = new AsyncConsumerPipe<>(p1)) {
 
@@ -69,9 +69,9 @@ public class SyncToAsyncPipeTest {
   @Test
   public void testThreePipesTwoThreads() throws Exception {
     List<Long> producedItems = Collections.synchronizedList(new ArrayList<>());
-    try (Pipe<Long> p01 = new SeqGenPipe<Long>(i -> 3 * i, 3); // 0, 3, 6
-         Pipe<Long> p02 = new SeqGenPipe<Long>(i -> 3 * i + 1, 3); // 1, 4, 7
-         Pipe<Long> p03 = new SeqGenPipe<Long>(i -> 3 * i + 2, 3); // 2, 5, 8
+    try (Pipe<Long> p01 = new SeqGenPipe<>(i -> 3 * i, 3); // 0, 3, 6
+         Pipe<Long> p02 = new SeqGenPipe<>(i -> 3 * i + 1, 3); // 1, 4, 7
+         Pipe<Long> p03 = new SeqGenPipe<>(i -> 3 * i + 2, 3); // 2, 5, 8
          AsyncPipe<Long> p1 = SyncToAsyncPipe.fromPipes(Lists.newArrayList(p01, p02, p03), 2);
          TerminalPipe tp = new AsyncConsumerPipe<>(p1, producedItems::add)) {
       tp.start();
@@ -83,8 +83,8 @@ public class SyncToAsyncPipeTest {
   @Test
   public void testTwoPipesThreeThreads() throws Exception {
     List<Long> producedItems = Collections.synchronizedList(new ArrayList<>());
-    try (Pipe<Long> p01 = new SeqGenPipe<Long>(i -> 2 * i, 3); // 0, 2, 4
-         Pipe<Long> p02 = new SeqGenPipe<Long>(i -> 2 * i + 1, 3); // 1, 3, 5
+    try (Pipe<Long> p01 = new SeqGenPipe<>(i -> 2 * i, 3); // 0, 2, 4
+         Pipe<Long> p02 = new SeqGenPipe<>(i -> 2 * i + 1, 3); // 1, 3, 5
          AsyncPipe<Long> p1 = SyncToAsyncPipe.fromPipes(Lists.newArrayList(p01, p02), 3);
          TerminalPipe tp = new AsyncConsumerPipe<>(p1, producedItems::add)) {
       tp.start();
@@ -96,8 +96,8 @@ public class SyncToAsyncPipeTest {
   @Test
   public void testStoppingByError() throws Exception {
     PipeException e = new ValidationPipeException("Test");
-    try (Pipe<Long> p0 = new SeqGenPipe<Long>(i -> i, 100);
-         Pipe<Long> p1 = ConcatPipe.fromPipes(p0, new ErrorPipe<Long>(e));
+    try (Pipe<Long> p0 = new SeqGenPipe<>(i -> i, 100);
+         Pipe<Long> p1 = ConcatPipe.fromPipes(p0, new ErrorPipe<>(e));
          AsyncPipe<Long> p2 = SyncToAsyncPipe.fromPipes(Collections.singletonList(p1), 2);
          TerminalPipe tp = new AsyncConsumerPipe<>(p2)) {
       try {
@@ -111,8 +111,8 @@ public class SyncToAsyncPipeTest {
   @Test
   public void testTwoPipesOneThread() throws Exception {
     List<Long> producedItems = Collections.synchronizedList(new ArrayList<>());
-    try (Pipe<Long> p01 = new SeqGenPipe<Long>(i -> 2 * i + 1, 5); // 1, 3, 5, 7, 9
-         Pipe<Long> p02 = new SeqGenPipe<Long>(i -> 2 * i, 5); // 0, 2, 4, 6, 8
+    try (Pipe<Long> p01 = new SeqGenPipe<>(i -> 2 * i + 1, 5); // 1, 3, 5, 7, 9
+         Pipe<Long> p02 = new SeqGenPipe<>(i -> 2 * i, 5); // 0, 2, 4, 6, 8
          AsyncPipe<Long> p1 = SyncToAsyncPipe.fromPipes(Lists.newArrayList(p01, p02), 1);
          TerminalPipe tp = new AsyncConsumerPipe<>(p1, producedItems::add)) {
       tp.start();

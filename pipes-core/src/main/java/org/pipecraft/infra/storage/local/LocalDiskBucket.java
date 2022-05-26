@@ -50,8 +50,8 @@ public class LocalDiskBucket extends Bucket<File> {
   /**
    * Constructor
    * 
-   * @param baseFolder The folder under which the bucket is assumed to be located
-   * @param bucketName
+   * @param baseFolder The local folder under which the bucket is assumed to be located
+   * @param bucketName The name of the bucket. This name will also be used as a subfolder under baseFolder.
    */
   LocalDiskBucket(File baseFolder, String bucketName) {
     super(bucketName);

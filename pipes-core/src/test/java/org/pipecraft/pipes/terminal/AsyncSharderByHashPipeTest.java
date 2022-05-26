@@ -28,7 +28,7 @@ public class AsyncSharderByHashPipeTest {
     File tmpFolder = FileUtils.createTempFolder("Test");
     try (
         DummyAsyncPipe source = new DummyAsyncPipe(0, 9, true);
-        AsyncSharderPipe<Integer> sharder = new AsyncSharderByHashPipe<>(source, new TxtEncoderFactory<>(v -> v.toString()), 2, tmpFolder);
+        AsyncSharderPipe<Integer> sharder = new AsyncSharderByHashPipe<>(source, new TxtEncoderFactory<>(Object::toString), 2, tmpFolder);
         ) {
       sharder.start();
       assertEquals(2, tmpFolder.list().length);
@@ -51,9 +51,9 @@ public class AsyncSharderByHashPipeTest {
     File tmpFolder = FileUtils.createTempFolder("Test");
     try (
         DummyAsyncPipe source = new DummyAsyncPipe(0, 10, false); // Reports error after 10 items
-        AsyncSharderPipe<Integer> sharder = new AsyncSharderByHashPipe<>(source, new TxtEncoderFactory<>(v -> v.toString()), 2, tmpFolder);
+        AsyncSharderPipe<Integer> sharder = new AsyncSharderByHashPipe<>(source, new TxtEncoderFactory<>(Object::toString), 2, tmpFolder);
         ) {
-      assertThrows(ValidationPipeException.class, () -> sharder.start());
+      assertThrows(ValidationPipeException.class, sharder::start);
     } finally {
       FileUtils.deleteFiles(tmpFolder);
     }

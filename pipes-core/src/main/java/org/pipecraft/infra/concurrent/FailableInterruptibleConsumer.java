@@ -36,10 +36,6 @@ public interface FailableInterruptibleConsumer <T,E extends Exception> {
    * @param <E> The exception type
    */
   static <T, E extends Exception> FailableInterruptibleConsumer<T,E> fromConsumer(Consumer<T> consumer) {
-    return new FailableInterruptibleConsumer<T, E>() {
-      @Override
-      public void accept(T t) throws E {
-        consumer.accept(t);
-      }};
+    return consumer::accept;
   }
 }

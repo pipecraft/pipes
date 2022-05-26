@@ -12,9 +12,9 @@ import java.util.function.Function;
  * A {@link CheckedFuture} decorator converting a checked future with value type S to a checked future with value type T.
  * Preserves the exception type.
  * 
- * @param S The source future type
- * @param T The target future type
- * @param E The type of the checked exception thrown by the checkedGet() methods
+ * @param <S> The source future type
+ * @param <T> The target future type
+ * @param <E> The type of the checked exception thrown by the checkedGet() methods
  * 
  * @author Eyal Schneider
  * 

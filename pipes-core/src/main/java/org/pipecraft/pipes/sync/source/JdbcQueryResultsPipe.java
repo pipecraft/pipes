@@ -65,8 +65,8 @@ public class JdbcQueryResultsPipe<T> implements Pipe<T> {
       resultSet = statement.executeQuery(query);
       prepareNext();
     } catch (SQLException e) {
-      closeResources(e);
-      throw new JdbcPipeException(e);
+      SQLException e2 = closeResources(e);
+      throw new JdbcPipeException(e2);
     }
   }
 
@@ -89,8 +89,8 @@ public class JdbcQueryResultsPipe<T> implements Pipe<T> {
         done = true;
       }
     } catch (SQLException e) {
-      closeResources(e);
-      throw new JdbcPipeException(e);
+      SQLException e2 = closeResources(e);
+      throw new JdbcPipeException(e2);
     }
   }
 

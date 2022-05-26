@@ -2,13 +2,8 @@ package org.pipecraft.infra.storage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.pipecraft.infra.io.Retrier;
-import org.pipecraft.infra.concurrent.ParallelTaskProcessor;
-import org.pipecraft.infra.io.SizedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +36,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
+import org.pipecraft.infra.concurrent.ParallelTaskProcessor;
+import org.pipecraft.infra.io.Retrier;
+import org.pipecraft.infra.io.SizedInputStream;
 
 /**
  * A base class for a storage bucket implementations. 
@@ -551,7 +551,7 @@ public abstract class Bucket<T> {
       throw new FileNotFoundException("The folder " + inputFolder.getAbsolutePath() + " does not exist or isn't a folder");
     }
     Path basePath = inputFolder.toPath();
-    List<Path> files = Files.walk(basePath).filter(p -> p.toFile().isFile()).map(p -> basePath.relativize(p)).collect(Collectors.toList());
+    List<Path> files = Files.walk(basePath).filter(p -> p.toFile().isFile()).map(basePath::relativize).collect(Collectors.toList());
 
     ParallelTaskProcessor.runFailable(files, parallelism, f -> {
       putFileInterruptibly(finalPath + f.toFile().getPath(), basePath.resolve(f).toFile(), isPublic, maxRetries, initialRetrySleepSec, waitTimeFactor);
@@ -1083,9 +1083,7 @@ public abstract class Bucket<T> {
    * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyInterruptibly(String fromKey, String toKey, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
-    Retrier.run(() -> {
-      copy(fromKey, toKey);
-    }, initialRetrySleepSec * 1000, waitTimeFactor, maxRetries + 1);
+    Retrier.run(() -> copy(fromKey, toKey), initialRetrySleepSec * 1000, waitTimeFactor, maxRetries + 1);
   }
 
   /**
@@ -1114,9 +1112,7 @@ public abstract class Bucket<T> {
    * @throws InterruptedException In case that the current thread is interrupted
    */
   public void copyToAnotherBucketInterruptibly(String fromKey, String toBucket, String toKey, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
-    Retrier.run(() -> {
-      copyToAnotherBucket(fromKey, toBucket, toKey);
-    }, initialRetrySleepSec * 1000, waitTimeFactor, maxRetries + 1);
+    Retrier.run(() -> copyToAnotherBucket(fromKey, toBucket, toKey), initialRetrySleepSec * 1000, waitTimeFactor, maxRetries + 1);
   }
 
   /**
@@ -1383,9 +1379,7 @@ public abstract class Bucket<T> {
    * @throws InterruptedException In case that the current thread is interrupted
    */
   public void deleteAllByMetaInterruptibly(Collection<T> fileRefs, int parallelism, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
-    ParallelTaskProcessor.runFailable(fileRefs, parallelism, m -> {
-      deleteInterruptibly(m, maxRetries, initialRetrySleepSec, waitTimeFactor);
-    });
+    ParallelTaskProcessor.runFailable(fileRefs, parallelism, m -> deleteInterruptibly(m, maxRetries, initialRetrySleepSec, waitTimeFactor));
   }
 
   /**
@@ -1715,7 +1709,7 @@ public abstract class Bucket<T> {
    * @throws IOException upon failure to list the bucket
    */
   public Iterator<T> listFolders(String folderPath) throws IOException {
-    return listObjects(folderPath, Predicates.not(this::isFile));
+    return listObjects(folderPath, ((Predicate<T>) this::isFile).negate());
   }
 
   /**
@@ -1739,7 +1733,7 @@ public abstract class Bucket<T> {
    * @param path the base path to look for, relative to the bucket
    * @param pattern the full path pattern (relative to bucket) to match against
    * @return the metadata object corresponding the the last file, or null if not found
-   * @throws IOException
+   * @throws IOException In case of IO error when listing the files in the given path
    */
   public T getLastFile(String path, Pattern pattern) throws IOException {
     Optional<T> max = Streams.stream(listFilesRecursive(path, pattern)).max(Comparator.comparing(this::getPath));
@@ -1798,7 +1792,7 @@ public abstract class Bucket<T> {
    */
   public Map<String, T> getObjectMetadata(Collection<String> filePaths, int maxRetries, int initialRetrySleepSec, double waitTimeFactor) throws IOException, InterruptedException {
     MutableObject<Map<String, T>> metaObjs = new MutableObject<>();
-    Retrier.run(() -> { metaObjs.setValue(getObjectMetadata(filePaths)); },initialRetrySleepSec * 1000, waitTimeFactor,maxRetries + 1);
+    Retrier.run(() -> metaObjs.setValue(getObjectMetadata(filePaths)),initialRetrySleepSec * 1000, waitTimeFactor,maxRetries + 1);
     return metaObjs.getValue();
   }
 
@@ -1969,7 +1963,7 @@ public abstract class Bucket<T> {
   }
 
   private void validateAllPathsExist(Map<String,T> pathsToMeta) throws FileNotFoundException {
-    Optional<String> nonExistingPath = pathsToMeta.entrySet().stream().filter(x -> x.getValue() == null).map(x -> x.getKey()).findFirst();
+    Optional<String> nonExistingPath = pathsToMeta.entrySet().stream().filter(x -> x.getValue() == null).map(Entry::getKey).findFirst();
     if (nonExistingPath.isPresent()) {
       throw new FileNotFoundException("File doesn't exist: " + nonExistingPath.get());
     }

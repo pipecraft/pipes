@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Sets;
+import org.pipecraft.pipes.async.AsyncPipe;
 import org.pipecraft.pipes.async.DummyAsyncPipe;
 import org.pipecraft.pipes.exceptions.TimeoutPipeException;
 import org.pipecraft.pipes.terminal.AsyncConsumerPipe;
@@ -29,24 +30,22 @@ public class AsyncTimeoutPipeTest {
   public void testSuccess() throws Exception {
     Collection<Integer> items = Collections.synchronizedCollection(new ArrayList<>());
     try (
-        DummyAsyncPipe gen = new DummyAsyncPipe(0, 3, true);
-        AsyncTimeoutPipe<Integer> timeoutP = new AsyncTimeoutPipe<>(gen, Duration.ofSeconds(5), Executors.newScheduledThreadPool(1));
-        AsyncCallbackPipe<Integer> callbackP = new AsyncCallbackPipe<>(timeoutP, items::add);
-        TerminalPipe tp = new AsyncConsumerPipe<>(callbackP);
-        ) {
+        AsyncPipe<Integer> gen = new DummyAsyncPipe(0, 3, true);
+        AsyncPipe<Integer> timeoutP = new AsyncTimeoutPipe<>(gen, Duration.ofSeconds(5), Executors.newScheduledThreadPool(1));
+        AsyncPipe<Integer> callbackP = new AsyncCallbackPipe<>(timeoutP, items::add);
+        TerminalPipe tp = new AsyncConsumerPipe<>(callbackP)) {
       tp.start();
       assertEquals(Sets.newHashSet(0, 1, 2), new HashSet<>(items));
     }
   }
   
   @Test
-  public void testFailure() throws Exception {
+  public void testFailure() {
     assertThrows(TimeoutPipeException.class, () -> {
         try (
-            DummyAsyncPipe gen = new DummyAsyncPipe(0, Integer.MAX_VALUE, true); // Infinite stream
-            AsyncTimeoutPipe<Integer> timeoutP = new AsyncTimeoutPipe<>(gen, Duration.ofMillis(5), Executors.newScheduledThreadPool(1)); 
-            TerminalPipe tp = new AsyncConsumerPipe<>(timeoutP);
-            ) {
+            AsyncPipe<Integer> gen = new DummyAsyncPipe(0, Integer.MAX_VALUE, true); // Infinite stream
+            AsyncPipe<Integer> timeoutP = new AsyncTimeoutPipe<>(gen, Duration.ofMillis(5), Executors.newScheduledThreadPool(1));
+            TerminalPipe tp = new AsyncConsumerPipe<>(timeoutP)) {
           tp.start();
         }
       });

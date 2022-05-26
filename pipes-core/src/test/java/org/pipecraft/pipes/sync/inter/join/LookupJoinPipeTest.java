@@ -39,7 +39,7 @@ public class LookupJoinPipeTest {
             Employee::getRank,
             JoinMode.INNER
         );
-        TerminalPipe p = new CollectionWriterPipe<>(jp, actual);
+        TerminalPipe p = new CollectionWriterPipe<>(jp, actual)
     ) {
       p.start();
       Set<JoinRecord<Integer, Integer, Employee>> expected = Set.of(
@@ -64,7 +64,7 @@ public class LookupJoinPipeTest {
             Employee::getRank,
             JoinMode.OUTER
         );
-        TerminalPipe p = new CollectionWriterPipe<>(jp, actual);
+        TerminalPipe p = new CollectionWriterPipe<>(jp, actual)
         ) {
       p.start();
       Set<JoinRecord<Integer, Integer, Employee>> expected = Set.of(
@@ -92,7 +92,7 @@ public class LookupJoinPipeTest {
             Employee::getRank,
             JoinMode.LEFT
         );
-        TerminalPipe p = new CollectionWriterPipe<>(jp, actual);
+        TerminalPipe p = new CollectionWriterPipe<>(jp, actual)
     ) {
       p.start();
       Set<JoinRecord<Integer, Integer, Employee>> expected = Set.of(
@@ -118,7 +118,7 @@ public class LookupJoinPipeTest {
             Employee::getRank,
             JoinMode.FULL_INNER
         );
-        TerminalPipe p = new CollectionWriterPipe<>(jp, actual);
+        TerminalPipe p = new CollectionWriterPipe<>(jp, actual)
     ) {
       p.start();
 
@@ -145,7 +145,7 @@ public class LookupJoinPipeTest {
             Employee::getRank,
             JoinMode.OUTER
         );
-        TerminalPipe p = new CollectionWriterPipe<>(jp, actual);
+        TerminalPipe p = new CollectionWriterPipe<>(jp, actual)
     ) {
       p.start();
 
@@ -170,7 +170,7 @@ public class LookupJoinPipeTest {
             List.of(p1, p2),
             Employee::getRank
         );
-        TerminalPipe p = new CollectionWriterPipe<>(jp, actual);
+        TerminalPipe p = new CollectionWriterPipe<>(jp, actual)
     ) {
       p.start();
 

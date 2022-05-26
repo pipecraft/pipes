@@ -10,7 +10,7 @@ import java.lang.Thread.State;
  * @author Eyal Schneider
  */
 public class AsyncTester {
-  private Thread thread;
+  private final Thread thread;
   private volatile Error error;
   private volatile RuntimeException runtimeExc;
 
@@ -20,16 +20,13 @@ public class AsyncTester {
    * @param runnable The body of the test unit
    */
   public AsyncTester(final Runnable runnable) {
-    thread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          runnable.run();
-        } catch (Error e) {
-          error = e;
-        } catch (RuntimeException e) {
-          runtimeExc = e;
-        }
+    thread = new Thread(() -> {
+      try {
+        runnable.run();
+      } catch (Error e) {
+        error = e;
+      } catch (RuntimeException e) {
+        runtimeExc = e;
       }
     });
   }
@@ -45,7 +42,7 @@ public class AsyncTester {
    * Blocks until the test unit completes, and throws any runtime exceptions and errors that have
    * been thrown internally. Must not be called before start().
    * 
-   * @throws InterruptedException
+   * @throws InterruptedException in case that the thread is interrupted while waiting for the test to complete
    */
   public void test() throws InterruptedException {
     thread.join();

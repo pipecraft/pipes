@@ -51,7 +51,7 @@ public class StorageMultiFileReaderPipe<T, B> extends CompoundPipe<T> {
       // Sort (For storage case we always have some ordering, possible the default lexicographic one)
       List<B> sortedFiles = new ArrayList<>(filesToRead);
       Bucket<B> bucket = config.getBucket();
-      Collections.sort(sortedFiles, config.getFileOrder());
+      sortedFiles.sort(config.getFileOrder());
 
       // Create pipe suppliers
       List<PipeSupplier<T>> pipesSuppliers;

@@ -31,14 +31,14 @@ public class ParallelTaskProcessorTest {
   @Test
   public void testNonFailableOneThread() throws Exception {
     Set<Integer> completed = Collections.synchronizedSet(new HashSet<>());
-    ParallelTaskProcessor.run(Arrays.asList(1,2,3,4,5), 1, v -> completed.add(v));
+    ParallelTaskProcessor.run(Arrays.asList(1,2,3,4,5), 1, completed::add);
     assertEquals(Sets.newHashSet(1,2,3,4,5), completed);
   }
 
   @Test
   public void testNonFailableMultipleThreads() throws Exception {
     Set<Integer> completed = Collections.synchronizedSet(new HashSet<>());
-    ParallelTaskProcessor.run(Arrays.asList(1,2,3,4,5), 4, v -> completed.add(v));
+    ParallelTaskProcessor.run(Arrays.asList(1,2,3,4,5), 4, completed::add);
     assertEquals(Sets.newHashSet(1,2,3,4,5), completed);
   }
 
@@ -46,7 +46,7 @@ public class ParallelTaskProcessorTest {
   public void testNonFailableSuppliedExecutor() throws Exception {
     Set<Integer> completed = Collections.synchronizedSet(new HashSet<>());
     ExecutorService ex = Executors.newFixedThreadPool(4);
-    ParallelTaskProcessor.run(ex, Arrays.asList(1,2,3,4,5), v -> completed.add(v));
+    ParallelTaskProcessor.run(ex, Arrays.asList(1,2,3,4,5), completed::add);
     assertEquals(Sets.newHashSet(1,2,3,4,5), completed);
     assertFalse(ex.isShutdown());
   }
@@ -67,14 +67,14 @@ public class ParallelTaskProcessorTest {
   @Test
   public void testFailableOneThread() throws Exception {
     Set<Integer> completed = Collections.synchronizedSet(new HashSet<>());
-    ParallelTaskProcessor.runFailable(Arrays.asList(1,2,3,4,5), 1, v -> completed.add(v));
+    ParallelTaskProcessor.runFailable(Arrays.asList(1,2,3,4,5), 1, completed::add);
     assertEquals(Sets.newHashSet(1,2,3,4,5), completed);
   }
 
   @Test
   public void testFailableMultipleThreads() throws Exception {
     Set<Integer> completed = Collections.synchronizedSet(new HashSet<>());
-    ParallelTaskProcessor.runFailable(Arrays.asList(1,2,3,4,5), 4, v -> completed.add(v));
+    ParallelTaskProcessor.runFailable(Arrays.asList(1,2,3,4,5), 4, completed::add);
     assertEquals(Sets.newHashSet(1,2,3,4,5), completed);
   }
 
@@ -82,7 +82,7 @@ public class ParallelTaskProcessorTest {
   public void testFailableSuppliedExecutor() throws Exception {
     Set<Integer> completed = Collections.synchronizedSet(new HashSet<>());
     ExecutorService ex = Executors.newFixedThreadPool(4);
-    ParallelTaskProcessor.runFailable(ex, Arrays.asList(1,2,3,4,5), v -> completed.add(v));
+    ParallelTaskProcessor.runFailable(ex, Arrays.asList(1,2,3,4,5), completed::add);
     assertEquals(Sets.newHashSet(1,2,3,4,5), completed);
     assertFalse(ex.isShutdown());
   }
@@ -130,7 +130,7 @@ public class ParallelTaskProcessorTest {
     ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
     try {
       Thread mainThread = Thread.currentThread();
-      ex.schedule(() -> mainThread.interrupt(), 100, TimeUnit.MILLISECONDS);
+      ex.schedule(mainThread::interrupt, 100, TimeUnit.MILLISECONDS);
       
       ParallelTaskProcessor.runFailable(Arrays.asList(1,2,3,4,5), 5, v -> {
         try {
@@ -148,7 +148,6 @@ public class ParallelTaskProcessorTest {
     }
   }
 
-  @SuppressWarnings("serial")
-  private class TestRuntimeException extends RuntimeException {
+  private static class TestRuntimeException extends RuntimeException {
   }
 }

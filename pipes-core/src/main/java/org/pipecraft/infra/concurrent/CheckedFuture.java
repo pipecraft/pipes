@@ -11,8 +11,8 @@ import java.util.concurrent.TimeoutException;
  * Extends {@link ListenableFuture} and adds checkedGet() methods which simplify Future's error handling.
  * This interface is a replacement for Google's deprecated CheckedFuture.
  * 
- * @param V The future's output value type
- * @param E The type of the checked exception thrown by the checkedGet() methods
+ * @param <V> The future's output value type
+ * @param <E> The type of the checked exception thrown by the checkedGet() methods
  * 
  * @author Eyal Schneider
  * 
@@ -26,7 +26,7 @@ public interface CheckedFuture<V, E extends Exception> extends ListenableFuture<
    * @throws E when an execution exception is detected and mapped
    * @throws CancellationException if the computation was cancelled
    */
-  public V checkedGet() throws InterruptedException, E;
+  V checkedGet() throws InterruptedException, E;
 
   /**
    * A simplified version of {@link Future#get(long, TimeUnit)} which maps {@link ExecutionException} to a more indicative exception type
@@ -39,5 +39,5 @@ public interface CheckedFuture<V, E extends Exception> extends ListenableFuture<
    * @throws E when an execution exception is detected and mapped
    * @throws CancellationException if the computation was cancelled
    */
-  public V checkedGet(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, E;
+  V checkedGet(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, E;
 }

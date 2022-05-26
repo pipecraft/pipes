@@ -1,5 +1,6 @@
 package org.pipecraft.pipes;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,7 +49,7 @@ public class BinFilePipesTest {
     FileInputStream fis = new FileInputStream(f);
     byte[] buffer = new byte[5];
     assertEquals(4, IOUtils.read(fis, buffer));
-    assertTrue(Arrays.equals(new byte[]{1, 2, 4, 7}, Arrays.copyOf(buffer, 4)));
+    assertArrayEquals(new byte[]{1, 2, 4, 7}, Arrays.copyOf(buffer, 4));
   }
 
   @Test

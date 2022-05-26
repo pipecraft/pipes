@@ -5,7 +5,6 @@ package org.pipecraft.infra.storage;
  * 
  * @author Eyal Schneider
  */
-@SuppressWarnings("serial")
 public class IllegalJsonException extends Exception {
 
   public IllegalJsonException(String message) {

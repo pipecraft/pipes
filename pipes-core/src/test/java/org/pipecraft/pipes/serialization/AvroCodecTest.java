@@ -62,11 +62,11 @@ public class AvroCodecTest {
       encoder.encode(data);
     }
     byte[] encoded = os.toByteArray();
-    byte[] partial = Arrays.copyOfRange(encoded, 0, (int) encoded.length / 2);
+    byte[] partial = Arrays.copyOfRange(encoded, 0, encoded.length / 2);
     try (
         ByteArrayInputStream is = new ByteArrayInputStream(partial);
         AvroDecoder<TestInfo> decoder = new AvroDecoder<>(TestInfo.class, is)) {
-      Assertions.assertThrows(EOFException.class, () -> decoder.decode());
+      Assertions.assertThrows(EOFException.class, decoder::decode);
     }
   }
   
@@ -98,7 +98,7 @@ public class AvroCodecTest {
 
     @Override
     public boolean equals(Object o) {
-      if (o == null || !(o instanceof TestInfo)) {
+      if (!(o instanceof TestInfo)) {
         return false;
       }
 

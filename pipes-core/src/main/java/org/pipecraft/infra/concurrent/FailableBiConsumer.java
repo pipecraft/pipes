@@ -42,10 +42,6 @@ public interface FailableBiConsumer <A, B, E extends Exception> {
    * @param <E> The exception type
    */
   static <X, Y, E extends Exception> FailableBiConsumer<X, Y, E> fromBiConsumer(BiConsumer<X, Y> biConsumer) {
-    return new FailableBiConsumer<X, Y, E>() {
-      @Override
-      public void accept(X a, Y b) throws E {
-        biConsumer.accept(a, b);
-      }};
+    return biConsumer::accept;
   }
 }

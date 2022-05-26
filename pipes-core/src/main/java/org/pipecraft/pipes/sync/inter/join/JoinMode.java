@@ -46,7 +46,7 @@ public enum JoinMode {
    * @param earlyExitPredicate A predicate which is given the set of active input pipes and the total number of pipes,
    * and determines whether an early exit is possible.
    */
-  private JoinMode(
+  JoinMode(
       BiPredicate<JoinRecord<?, ?, ?>, Integer> selector, 
       BiFunction<Pipe<?>, Collection<? extends Pipe<?>> , Float> progressResolver,
       BiPredicate<BitSet, Integer> earlyExitPredicate) {

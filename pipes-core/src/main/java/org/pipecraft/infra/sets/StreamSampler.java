@@ -27,7 +27,7 @@ public class StreamSampler {
   
   /**
    * To be called per visited item.
-   * @return
+   * @return true if and only if the current item should be accepted into the sample
    */
   public boolean accept() {
     boolean accepted = false;

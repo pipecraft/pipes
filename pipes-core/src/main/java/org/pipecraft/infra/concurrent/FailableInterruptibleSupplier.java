@@ -30,6 +30,6 @@ public interface FailableInterruptibleSupplier<T, E extends Exception> {
    * @param <E> The exception type
    */
   static <T, E extends Exception> FailableInterruptibleSupplier<T, E> fromSupplier(Supplier<T> supplier) {
-    return () -> supplier.get();
+    return supplier::get;
   }
 }

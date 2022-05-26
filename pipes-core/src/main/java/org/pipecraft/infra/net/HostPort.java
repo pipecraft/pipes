@@ -75,7 +75,7 @@ public class HostPort implements Comparable<HostPort> {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || !(o instanceof HostPort)) {
+    if (!(o instanceof HostPort)) {
       return false;
     }
 

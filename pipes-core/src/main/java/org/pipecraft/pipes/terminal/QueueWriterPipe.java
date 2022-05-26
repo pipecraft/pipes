@@ -27,7 +27,6 @@ public class QueueWriterPipe<T> extends TerminalPipe {
    * @param queue         The queue to write to
    *
    */
-  @SuppressWarnings("unchecked")
   public QueueWriterPipe(Pipe<T> inputPipe, BlockingQueue<QueueItem<T>> queue) {
     this.inputPipe = inputPipe;
     this.queue = queue;

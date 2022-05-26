@@ -34,7 +34,7 @@ public class OrderValidationPipeTest {
     List<Integer> inputItems = Arrays.asList(5, 4, 3, 2, 1);
     Pipe<Integer> testDataPipe = new CollectionReaderPipe<>(inputItems);
     OrderValidationPipe<Integer> validatingPipe = new OrderValidationPipe<>(testDataPipe, Comparator.reverseOrder());
-    try (TerminalPipe collectorPipe = new ConsumerPipe<Integer>(validatingPipe, collectedItems::add)) {
+    try (TerminalPipe collectorPipe = new ConsumerPipe<>(validatingPipe, collectedItems::add)) {
       collectorPipe.start();
     }
 
@@ -51,7 +51,7 @@ public class OrderValidationPipeTest {
    * 1. pipe terminates with validation exception
    */
   @Test
-  public void startNotOrdered() throws Exception {
+  public void startNotOrdered() {
     assertThrows(ValidationPipeException.class, () -> {
       Pipe<Integer> testDataPipe = new CollectionReaderPipe<>(5, 4, 5, 2, 1);
       OrderValidationPipe<Integer> validatingPipe = new OrderValidationPipe<>(testDataPipe, Comparator.reverseOrder());

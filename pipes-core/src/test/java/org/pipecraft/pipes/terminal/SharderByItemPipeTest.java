@@ -174,7 +174,7 @@ public class SharderByItemPipeTest {
         CollectionReaderPipe<Integer> p0 = new CollectionReaderPipe<>(Lists.newArrayList(14, 24, 1004));
         SharderByItemPipe<Integer> p = new SharderByItemPipe<>(
             p0, 
-            new TxtEncoderFactory<>(v -> v.toString(), StandardCharsets.UTF_8),
+            new TxtEncoderFactory<>(Object::toString, StandardCharsets.UTF_8),
             item -> String.valueOf(item % 10), // Buckets are defined by the unit digit of each number
             folder,
             new FileWriteOptions()
@@ -198,7 +198,7 @@ public class SharderByItemPipeTest {
         CollectionReaderPipe<Integer> p0 = new CollectionReaderPipe<>(Lists.newArrayList(11, 20, 14, 30, 21, 31, 35));
         SharderByItemPipe<Integer> p = new SharderByItemPipe<>(
             p0, 
-            new TxtEncoderFactory<>(v -> v.toString()),
+            new TxtEncoderFactory<>(Object::toString),
             item -> String.valueOf(item % 10), // Buckets are defined by the unit digit of each number
             folder,
             new FileWriteOptions()

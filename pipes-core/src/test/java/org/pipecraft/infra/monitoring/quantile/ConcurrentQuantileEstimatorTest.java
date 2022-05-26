@@ -175,9 +175,8 @@ public class ConcurrentQuantileEstimatorTest {
 
   @Test
   public void testSingleThreadAccuracy() {
-    for (ConcurrentQuantileEstimator digest: digests) {
+    for (ConcurrentQuantileEstimator digest : digests) {
       double[] values = new double[20000];
-      Percentile exact = new Percentile();
 
       for (int i = 0; i < 10000; i++) {
         double val = r.nextGaussian() * 100 + 500;

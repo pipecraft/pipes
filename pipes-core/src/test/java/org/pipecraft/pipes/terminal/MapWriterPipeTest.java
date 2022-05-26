@@ -59,7 +59,7 @@ public class MapWriterPipeTest {
   @Test
   public void testValidationError() throws Exception {
     try (
-        Pipe<String> genPipe = new CollectionReaderPipe<String>("1", "2", "3i");
+        Pipe<String> genPipe = new CollectionReaderPipe<>("1", "2", "3i");
         TerminalPipe tp = new MapWriterPipe<>(genPipe, p -> {
           try {
             return Integer.parseInt(p);

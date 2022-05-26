@@ -29,17 +29,17 @@ public class MonitoringTreeTest {
     DummyMonitorable a1_b1_c1 = new DummyMonitorable("x");
     DummyMonitorable a2_b1_c1 = new DummyMonitorable("y");
     DummyMonitorable a2_b1_c2 = new DummyMonitorable("z");
-    HashMap<String, JsonMonitorable> children = new HashMap<String, JsonMonitorable>();
+    HashMap<String, JsonMonitorable> children = new HashMap<>();
     children.put("C1", a2_b1_c1);
     children.put("C2", a2_b1_c2);
     DummyMonitorable a2_b1 = new DummyMonitorable("t", children);
-    children = new HashMap<String, JsonMonitorable>();
+    children = new HashMap<>();
     children.put("C1", a1_b1_c1);
     DummyMonitorable a1_b1 = new DummyMonitorable("v", children);    
-    children = new HashMap<String, JsonMonitorable>();
+    children = new HashMap<>();
     children.put("B1", a1_b1);
     DummyMonitorable a1 = new DummyMonitorable("u", children);    
-    children = new HashMap<String, JsonMonitorable>();
+    children = new HashMap<>();
     children.put("B1", a2_b1);
     DummyMonitorable a2 = new DummyMonitorable("w", children);        
     
@@ -52,27 +52,27 @@ public class MonitoringTreeTest {
   private static final Map<String, Object> expectedJson;
   static {
     // Build map to compare with
-    HashMap<String, Object> expected_a1_b1_c1 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a1_b1_c1 = new HashMap<>();
     expected_a1_b1_c1.put("name", "x");
-    HashMap<String, Object> expected_a2_b1_c1 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a2_b1_c1 = new HashMap<>();
     expected_a2_b1_c1.put("name", "y");
-    HashMap<String, Object> expected_a2_b1_c2 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a2_b1_c2 = new HashMap<>();
     expected_a2_b1_c2.put("name", "z");
-    HashMap<String, Object> expected_a2_b1 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a2_b1 = new HashMap<>();
     expected_a2_b1.put("name", "t");
     expected_a2_b1.put("C1", expected_a2_b1_c1);
     expected_a2_b1.put("C2", expected_a2_b1_c2);
-    HashMap<String, Object> expected_a1_b1 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a1_b1 = new HashMap<>();
     expected_a1_b1.put("name", "v");
     expected_a1_b1.put("C1", expected_a1_b1_c1);
-    HashMap<String, Object> expected_a1 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a1 = new HashMap<>();
     expected_a1.put("name", "u");
     expected_a1.put("B1", expected_a1_b1); 
-    HashMap<String, Object> expected_a2 = new HashMap<String, Object>();
+    HashMap<String, Object> expected_a2 = new HashMap<>();
     expected_a2.put("name", "w");
     expected_a2.put("B1", expected_a2_b1); 
     
-    expectedJson = new HashMap<String, Object>();
+    expectedJson = new HashMap<>();
     expectedJson.put("A1", expected_a1);
     expectedJson.put("A2", expected_a2);
   }

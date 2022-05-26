@@ -20,7 +20,7 @@ public class CallbackPipeTest {
   public void testItemCallback() throws Exception {
     MutableInt last = new MutableInt(-1);
     CollectionReaderPipe<Integer> p1 = new CollectionReaderPipe<>(1, 2, 3);
-    try (CallbackPipe<Integer> p = new CallbackPipe<>(p1, v -> {last.setValue(v);})) {
+    try (CallbackPipe<Integer> p = new CallbackPipe<>(p1, last::setValue)) {
       p.start();
       assertEquals(Integer.valueOf(-1), last.getValue());
       p.next();
@@ -38,7 +38,7 @@ public class CallbackPipeTest {
   public void testTerminationCallback() throws Exception {
     MutableInt last = new MutableInt(-1);
     CollectionReaderPipe<Integer> p1 = new CollectionReaderPipe<>(1, 2, 3);
-    try (CallbackPipe<Integer> p = new CallbackPipe<>(p1, () -> last.increment())) {
+    try (CallbackPipe<Integer> p = new CallbackPipe<>(p1, last::increment)) {
       p.start();
       assertEquals(Integer.valueOf(-1), last.getValue());
       
@@ -58,7 +58,7 @@ public class CallbackPipeTest {
   public void testTerminationCallbackThroughPeek() throws Exception {
     MutableInt last = new MutableInt(-1);
     EmptyPipe<Integer> p1 = EmptyPipe.instance();
-    try (CallbackPipe<Integer> p = new CallbackPipe<>(p1, () -> last.increment())) {
+    try (CallbackPipe<Integer> p = new CallbackPipe<>(p1, last::increment)) {
       p.start();
       assertEquals(Integer.valueOf(-1), last.getValue());
       p.peek();

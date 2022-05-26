@@ -59,7 +59,7 @@ public class PipeUtilsTest {
 
   private void test(int from, int to, int step, List<Integer> inputPcts, List<Integer> expectedOutput) {
     List<Integer> reported = new ArrayList<>();
-    Consumer<Integer> l = (pct) -> {reported.add(pct);};
+    Consumer<Integer> l = reported::add;
     l = new ProgressTransformer(l, from, to, step);
     for (Integer pct : inputPcts) {
       l.accept(pct);

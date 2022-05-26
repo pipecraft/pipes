@@ -59,7 +59,7 @@ public class QuantileDigestTest {
 
     digest1.add(others);
 
-    assertEquals(digest1.size(), insertCount * (others.size() + 1));
+    assertEquals(digest1.size(), (long) insertCount * (others.size() + 1));
   }
 
   @Test

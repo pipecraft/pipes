@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -135,8 +136,7 @@ public class FileUtils {
    * @throws IOException in case of read error
    */
   public static List<String> getListFromReader(Reader reader) throws IOException {
-    BufferedReader br = new BufferedReader(reader);
-    try {
+    try (BufferedReader br = new BufferedReader(reader)) {
       ArrayList<String> res = new ArrayList<>();
       String line = br.readLine();
       while (line != null) {
@@ -144,8 +144,6 @@ public class FileUtils {
         line = br.readLine();
       }
       return res;
-    } finally {
-      br.close();
     }
   }
 
@@ -466,7 +464,7 @@ public class FileUtils {
 
 
   /**
-   * creates a folder
+   * creates a folder, or keeps it if exists
    *
    * @param parentFolder the parent folder that should contain the folder
    * @param folderPath path (including the name) of the folder
@@ -532,6 +530,9 @@ public class FileUtils {
     File[] filesToSort;
     if (src.isDirectory()) {
       filesToSort = src.listFiles();
+      if (filesToSort == null) {
+        throw new FileNotFoundException("Files to sort in folder " + src + " are inaccessible.");
+      }
     } else {
       filesToSort = new File[]{src};
     }
@@ -554,6 +555,9 @@ public class FileUtils {
   public static void sort(File srcDir, FilenameFilter fnameFilter, File trgt, File tmpDir, int memLimit)
       throws IOException, InterruptedException {
     File[] filesToSort = srcDir.listFiles(fnameFilter);
+    if (filesToSort == null) {
+      throw new FileNotFoundException("Files to sort in folder " + srcDir + " are inaccessible.");
+    }
     sort(filesToSort, trgt, tmpDir, memLimit);
   }
 
@@ -815,7 +819,12 @@ public class FileUtils {
       throw new IllegalArgumentException("Must specify a valid compression");
     }
     try {
-      ParallelTaskProcessor.runFailable(Arrays.asList(folder.listFiles()), parallelism, f -> {
+      File[] files = folder.listFiles();
+      if (files == null) {
+        throw new FileNotFoundException("Files to compress in folder " + folder + " are inaccessible.");
+      }
+
+      ParallelTaskProcessor.runFailable(Arrays.asList(files), parallelism, f -> {
         compress(f, compression, compressionLevel);
         deleteFiles(f);
       });
@@ -881,7 +890,11 @@ public class FileUtils {
       throw new IllegalArgumentException("Must specify a valid compression");
     }
     try {
-      ParallelTaskProcessor.runFailable(Arrays.asList(folder.listFiles()), parallelism, f -> {
+      File[] files = folder.listFiles();
+      if (files == null) {
+        throw new FileNotFoundException("Files to decompress in folder " + folder + " are inaccessible.");
+      }
+      ParallelTaskProcessor.runFailable(Arrays.asList(files), parallelism, f -> {
         decompress(f, compression);
         deleteFiles(f);
       });
@@ -1002,8 +1015,7 @@ public class FileUtils {
    */
   public static File createUniqueFolder(String prefix, File parentFolder) throws IOException {
     Path path = Files.createTempDirectory(parentFolder.toPath(), prefix);
-    File res = path.toFile();
-    return res;
+    return path.toFile();
   }
 
   /**
@@ -1029,8 +1041,7 @@ public class FileUtils {
    */
   public static File createUniqueFolder(String prefix) throws IOException {
     Path path = Files.createTempDirectory(prefix);
-    File res = path.toFile();
-    return res;
+    return path.toFile();
   }
 
   /**
@@ -1461,6 +1472,7 @@ public class FileUtils {
    */
   public static long getTotalSizeRecursive(File folder) {
     long total = 0;
+
     for (File f : folder.listFiles()) {
       if (f.isFile()) {
         total += f.length();

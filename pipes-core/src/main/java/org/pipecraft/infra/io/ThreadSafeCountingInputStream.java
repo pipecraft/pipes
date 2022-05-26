@@ -4,12 +4,10 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.google.common.io.CountingInputStream;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Copied from Guava's {@link CountingInputStream}.
+ * Copied from Guava's CountingInputStream.
  * Changed the state variables to be volatile, to allow the caller of the getCount() to be from a different thread than the reader thread.
  * So it's thread safe in the sense that we allow a single reader thread, and multiple querying threads calling getCount().
  * 
